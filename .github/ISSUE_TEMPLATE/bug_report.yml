@@ -1,0 +1,53 @@
+name: 🐞 Reportar bug
+description: Relate um problema encontrado no Forja
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Por favor, preencha todos os campos com o máximo de detalhes."
+
+  - type: input
+    id: titulo
+    attributes:
+      label: Título do bug
+      placeholder: Ex: Erro ao criar novo projeto
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição do problema
+      description: O que está acontecendo? Qual era o comportamento esperado?
+
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passos para reproduzir o bug
+      description: Detalhe o caminho que levou ao erro
+      placeholder: |
+        1. Vá para '...'
+        2. Clique em '...'
+        3. Veja o erro em '...'
+
+  - type: input
+    id: ambiente
+    attributes:
+      label: Ambiente
+      placeholder: ex: macOS Ventura, navegador Chrome 125, bun v1.1.33
+
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Nível de prioridade
+      options:
+        - Baixa
+        - Média
+        - Alta
+
+  - type: checkboxes
+    id: confirmacoes
+    attributes:
+      label: Confirmações
+      options:
+        - label: Já testei em outra máquina ou navegador
+        - label: Este bug é recorrente
+        - label: Li os logs e não encontrei nada relevante

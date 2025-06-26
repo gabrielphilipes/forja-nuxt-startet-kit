@@ -1,0 +1,28 @@
+name: ✨ Sugestão de funcionalidade
+description: Proponha uma nova feature para o Forja
+labels: [feature]
+body:
+  - type: input
+    id: titulo
+    attributes:
+      label: Nome da funcionalidade sugerida
+      placeholder: Ex: Exportar projetos como PDF
+
+  - type: textarea
+    id: proposta
+    attributes:
+      label: O que essa funcionalidade faz?
+      description: Descreva claramente o que deseja que seja implementado
+
+  - type: textarea
+    id: justificativa
+    attributes:
+      label: Por que essa funcionalidade é importante?
+      description: Explique o impacto positivo esperado para o projeto
+
+  - type: textarea
+    id: detalhes
+    attributes:
+      label: Considerações técnicas
+      description: Alguma ideia de como implementar? APIs envolvidas, bibliotecas, etc.
+      optional: true
