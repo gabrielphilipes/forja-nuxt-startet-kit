@@ -10,7 +10,10 @@
     "postinstall": "nuxt prepare",
     "prepare": "husky",
     "commit": "cz",
-    "lint:prettier": "prettier --write \"**/*.{js,jsx,ts,js,tsx,vue,css,scss,json,md}\""
+    "lint:prettier": "prettier --check \"**/*.{js,jsx,ts,js,tsx,vue,css,scss,json,md}\"",
+    "lint:prettier:fix": "prettier --write \"**/*.{js,jsx,ts,js,tsx,vue,css,scss,json,md}\"",
+    "lint:eslint": "eslint .",
+    "lint:eslint:fix": "eslint --fix ."
   },
   "dependencies": {
     "nuxt": "^3.17.5",
@@ -21,6 +24,8 @@
     "@commitlint/cli": "19.8.1",
     "@commitlint/config-conventional": "19.8.1",
     "cz-conventional-changelog": "3.3.0",
+    "@nuxt/eslint": "1.4.1",
+    "eslint": "9.29.0",
     "husky": "9.1.7",
     "prettier": "3.6.1"
   },

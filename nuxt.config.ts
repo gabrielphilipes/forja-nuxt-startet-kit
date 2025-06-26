@@ -7,5 +7,7 @@ export default defineNuxtConfig({
   serverDir: 'server',
   nitro: {
     preset: 'vercel'
-  }
+  },
+
+  modules: ['@nuxt/eslint']
 })
