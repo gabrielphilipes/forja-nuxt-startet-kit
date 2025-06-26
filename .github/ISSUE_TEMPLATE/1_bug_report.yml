@@ -1,3 +1,6 @@
+name: 🐛 Reportar bug
+description: Reporte um erro que você encontrou
+labels: [bug]
 body:
   - type: markdown
     attributes:

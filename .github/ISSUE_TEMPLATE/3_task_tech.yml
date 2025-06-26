@@ -1,4 +1,4 @@
-name: Tarefa técnica
+name: 🔧 Tarefa técnica
 description: Criação de uma tarefa interna (refatoração, testes, etc.)
 labels: [tech-debt]
 body:
