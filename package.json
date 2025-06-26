@@ -17,7 +17,8 @@
     "lint:eslint:fix": "eslint --fix .",
     "services:up": "docker compose -f infra/docker-compose.yml up -d",
     "services:down": "docker compose -f infra/docker-compose.yml down",
-    "services:wait-database": "bun run infra/wait-database.js"
+    "services:wait-database": "bun run infra/wait-database.js",
+    "check-updates": "bunx npm-check-updates -i --format group"
   },
   "dependencies": {
     "nuxt": "^3.17.5",
