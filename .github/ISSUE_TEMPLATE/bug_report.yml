@@ -1,53 +1,49 @@
-name: 🐞 Reportar bug
-description: Relate um problema encontrado no Forja
-labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: "Por favor, preencha todos os campos com o máximo de detalhes."
-
-  - type: input
-    id: titulo
-    attributes:
-      label: Título do bug
-      placeholder: Ex: Erro ao criar novo projeto
+      value: |
+        Antes de abrir um novo issue, faça uma [pesquisa](https://github.com/gabrielphilipes/forja-nuxt-startet-kit/issues) para garantir que não está reportando um problema duplicado. Caso encontre um issue equivalente, contribua com informações adicionais, se necessário.
 
   - type: textarea
-    id: descricao
     attributes:
-      label: Descrição do problema
-      description: O que está acontecendo? Qual era o comportamento esperado?
-
-  - type: textarea
-    id: passos
-    attributes:
-      label: Passos para reproduzir o bug
-      description: Detalhe o caminho que levou ao erro
+      label: Descrição
+      description: Que tipo de problema você encontrou? Por favor, descreva-o de forma clara e adicione imagens, se aplicável.
       placeholder: |
-        1. Vá para '...'
-        2. Clique em '...'
-        3. Veja o erro em '...'
+        Eu encontrei um problema na página de ... quando eu estava tentando...
+        O resultado foi esse:
+        ![imagem](https://example.com/imagem)
+    validations:
+      required: true
 
-  - type: input
-    id: ambiente
+  - type: textarea
     attributes:
-      label: Ambiente
-      placeholder: ex: macOS Ventura, navegador Chrome 125, bun v1.1.33
+      label: Passos para reproduzir o problema
+      description: Quais são os passos necessários para que outra pessoa consiga encontrar o mesmo problema?
+      placeholder: |
+        1. Como usuário logado, acesse a página...
+        2. Clique em...
+        3. Faça...
+        4. Volte para ... e veja o erro.
+    validations:
+      required: true
 
   - type: dropdown
-    id: prioridade
     attributes:
-      label: Nível de prioridade
+      label: Navegadores testados
+      description: Em quais navegadores você percebeu esse problema?
+      multiple: true
       options:
-        - Baixa
-        - Média
-        - Alta
+        - Chrome
+        - Firefox
+        - Microsoft Edge
+        - Safari
+        - Outro
 
-  - type: checkboxes
-    id: confirmacoes
+  - type: textarea
     attributes:
-      label: Confirmações
-      options:
-        - label: Já testei em outra máquina ou navegador
-        - label: Este bug é recorrente
-        - label: Li os logs e não encontrei nada relevante
+      label: Possível solução
+      description: Você pensou em algo que pode resolver esse problema? Se sim, compartilhe abaixo.
+      placeholder: |
+        Ao invés de ... poderíamos mudar ... para...
+        Aqui está um exemplo de como ficaria:
+        ![imagem](https://example.com/imagem)

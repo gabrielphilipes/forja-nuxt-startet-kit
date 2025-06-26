@@ -1,30 +1,12 @@
-name: ✅ Tarefa técnica
-description: Registre uma melhoria ou refatoração interna
+name: Tarefa técnica
+description: Criação de uma tarefa interna (refatoração, testes, etc.)
 labels: [tech-debt]
 body:
-  - type: input
-    id: titulo
-    attributes:
-      label: Título da tarefa
-      placeholder: Refatorar componente ProjectCard
-
   - type: textarea
     id: escopo
     attributes:
       label: O que precisa ser feito?
-      description: Detalhe a proposta da tarefa técnica
-
   - type: textarea
     id: impacto
     attributes:
       label: Qual o impacto esperado?
-      description: Por que essa melhoria/refatoração é relevante?
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Itens a revisar
-      options:
-        - label: Não afeta a API pública
-        - label: Não altera comportamento visível para o usuário
-        - label: Cobertura de testes ajustada
