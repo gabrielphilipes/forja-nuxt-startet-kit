@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "bun run services:up && bun run services:wait-database && bun run nuxt dev",
+    "postdev": "bun run services:down",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -13,7 +14,10 @@
     "lint:prettier": "prettier --check \"**/*.{js,jsx,ts,js,tsx,vue,css,scss,json,md}\"",
     "lint:prettier:fix": "prettier --write \"**/*.{js,jsx,ts,js,tsx,vue,css,scss,json,md}\"",
     "lint:eslint": "eslint .",
-    "lint:eslint:fix": "eslint --fix ."
+    "lint:eslint:fix": "eslint --fix .",
+    "services:up": "docker compose -f infra/docker-compose.yml up -d",
+    "services:down": "docker compose -f infra/docker-compose.yml down",
+    "services:wait-database": "bun run infra/wait-database.js"
   },
   "dependencies": {
     "nuxt": "^3.17.5",
