@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: forja-postgres
+    env_file:
+      - ../.env
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+
+  mailcrab:
+    image: marlonb/mailcrab:latest
+    container_name: forja-mailcrab
+    ports:
+      - '${MAILCRAB_PORT:-1080}:1080'
+      - '${MAILCRAB_SMTP_PORT:-1025}:1025'
