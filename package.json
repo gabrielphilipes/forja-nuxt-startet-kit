@@ -9,6 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "prepare": "husky",
+    "commit": "cz",
     "lint:prettier": "prettier --write \"**/*.{js,jsx,ts,js,tsx,vue,css,scss,json,md}\""
   },
   "dependencies": {
@@ -17,7 +18,15 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
+    "cz-conventional-changelog": "3.3.0",
     "husky": "9.1.7",
     "prettier": "3.6.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
