@@ -3,6 +3,18 @@ name: Linting
 on: pull_request
 
 jobs:
+  secretlint:
+    name: 'Secretlint'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+      - run: bunx secretlint "**/*"
+
   eslint:
     name: 'ESLint'
     runs-on: ubuntu-latest
