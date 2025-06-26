@@ -1,0 +1,8 @@
+FILES=$(git diff --cached --name-only --diff-filter=d | grep -E '\.(js|jsx|ts|js|tsx|vue|css|scss|json|md)$' || true)
+
+if [ -n "$FILES" ]; then
+  echo "\n\nFormatting files with Prettier..."
+  echo "$FILES" | xargs bun run lint:prettier -- --log-level silent
+
+  echo "$FILES" | xargs git add
+fi
