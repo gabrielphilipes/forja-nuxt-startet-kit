@@ -17,8 +17,8 @@ export default defineEventHandler(async () => {
     updated_at: new Date().toISOString(),
     database: {
       version: version.rows[0].server_version,
-      max_connections: maxConnections.rows[0].max_connections,
-      opened_connections: openedConnections.rows[0].count
+      max_connections: parseInt(maxConnections.rows[0].max_connections),
+      opened_connections: parseInt(openedConnections.rows[0].count)
     }
   }
 })
