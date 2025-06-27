@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm'
-import { users, type User } from '../database/schemas/users'
+import { users, type InsertUser, type User } from '../database/schemas/users'
 import { useDB } from '../utils/database'
 
-const createUsingPassword = async (user: User): Promise<User> => {
+const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   await valideUniqueEmail(user.email)
   await validateStrongPassword(user.password!)
 
