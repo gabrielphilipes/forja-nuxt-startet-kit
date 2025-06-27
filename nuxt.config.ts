@@ -9,5 +9,5 @@ export default defineNuxtConfig({
     preset: 'vercel'
   },
 
-  modules: ['@nuxt/eslint']
+  modules: ['@nuxt/eslint', '@nuxt/test-utils/module']
 })

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "bun run services:up && bun run services:wait-database && bun run nuxt dev",
+    "dev": "bun run services:up && bun run services:wait-database && bun run migrations:migrate && bun run nuxt dev",
     "postdev": "bun run services:down",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -18,10 +18,16 @@
     "services:up": "docker compose -f infra/docker-compose.yml up -d",
     "services:down": "docker compose -f infra/docker-compose.yml down",
     "services:wait-database": "bun run infra/wait-database.js",
-    "check-updates": "bunx npm-check-updates -i --format group"
+    "migrations:generate": "drizzle-kit generate",
+    "migrations:migrate": "drizzle-kit migrate",
+    "check-updates": "bunx npm-check-updates -i --format group",
+    "test": "vitest"
   },
   "dependencies": {
+    "dotenv": "^16.6.0",
+    "drizzle-orm": "^0.44.2",
     "nuxt": "^3.17.5",
+    "pg": "^8.16.2",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
   },
@@ -29,12 +35,20 @@
     "@commitlint/cli": "19.8.1",
     "@commitlint/config-conventional": "19.8.1",
     "@nuxt/eslint": "1.4.1",
+    "@nuxt/test-utils": "^3.19.1",
+    "@secretlint/secretlint-rule-preset-recommend": "10.1.1",
+    "@types/pg": "^8.15.4",
+    "@vue/test-utils": "^2.4.6",
     "cz-conventional-changelog": "3.3.0",
+    "drizzle-kit": "^0.31.3",
     "eslint": "9.29.0",
+    "happy-dom": "^18.0.1",
     "husky": "9.1.7",
+    "playwright-core": "^1.53.1",
     "prettier": "3.6.1",
     "secretlint": "10.1.1",
-    "@secretlint/secretlint-rule-preset-recommend": "10.1.1"
+    "tsx": "^4.20.3",
+    "vitest": "^3.2.4"
   },
   "config": {
     "commitizen": {
