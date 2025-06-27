@@ -26,6 +26,7 @@
   "dependencies": {
     "dotenv": "^16.6.0",
     "drizzle-orm": "^0.44.2",
+    "nanoid": "5.1.5",
     "nuxt": "^3.17.5",
     "pg": "^8.16.2",
     "vue": "^3.5.17",
