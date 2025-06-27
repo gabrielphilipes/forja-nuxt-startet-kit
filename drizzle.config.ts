@@ -3,7 +3,7 @@ import { dbCredentials } from './server/utils/database'
 
 export default defineConfig({
   out: './server/database/migrations',
-  schema: './server/database/schema',
+  schema: './server/database/schemas',
   dialect: 'postgresql',
   dbCredentials
 })

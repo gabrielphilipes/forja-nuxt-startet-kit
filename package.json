@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "bun run services:up && bun run services:wait-database && bun run nuxt dev",
+    "dev": "bun run services:up && bun run services:wait-database && bun run migrations:migrate && bun run nuxt dev",
     "postdev": "bun run services:down",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -18,6 +18,8 @@
     "services:up": "docker compose -f infra/docker-compose.yml up -d",
     "services:down": "docker compose -f infra/docker-compose.yml down",
     "services:wait-database": "bun run infra/wait-database.js",
+    "migrations:generate": "drizzle-kit generate",
+    "migrations:migrate": "drizzle-kit migrate",
     "check-updates": "bunx npm-check-updates -i --format group",
     "test": "vitest"
   },
