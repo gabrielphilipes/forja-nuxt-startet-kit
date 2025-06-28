@@ -9,7 +9,7 @@ export default defineEventHandler(async (event: H3Event) => {
   )
 
   if (!success) {
-    throw createErrorValidation(error)
+    throw createErrorValidation('Ajuste os dados enviados e tente novamente', error)
   }
 
   await user.createUsingPassword(data)

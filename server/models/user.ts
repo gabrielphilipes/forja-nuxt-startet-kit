@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { users, type InsertUser, type User } from '../database/schemas/users'
 import { useDB } from '../utils/database'
+import { createErrorValidation } from '../utils/error'
 
 const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   await valideUniqueEmail(user.email)
@@ -12,45 +13,39 @@ const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
 }
 
 const valideUniqueEmail = async (email: string): Promise<void> => {
+  let user: User[] = []
+
   try {
-    const user = await useDB().select().from(users).where(eq(users.email, email))
-    if (user.length > 0) {
-      throw createError({ statusCode: 400, message: 'O e-mail informado já está em uso' })
-    }
+    user = await useDB().select().from(users).where(eq(users.email, email))
   } catch (error) {
     console.error(error)
-    throw createError({ statusCode: 500, message: 'Erro ao buscar usuário' })
+    throw createError({ statusCode: 500, message: 'Erro interno ao validar e-mail' })
+  }
+
+  if (user.length > 0) {
+    throw createError({ statusCode: 400, message: 'O e-mail informado já está em uso' })
   }
 }
 
 const validateStrongPassword = async (password: string): Promise<void> => {
   if (password.length < 8) {
-    throw createError({ statusCode: 400, message: 'A senha deve ter pelo menos 8 caracteres' })
+    throw createErrorValidation('A senha deve ter pelo menos 8 caracteres')
   }
 
   if (!/[A-Z]/.test(password)) {
-    throw createError({
-      statusCode: 400,
-      message: 'A senha deve conter pelo menos uma letra maiúscula'
-    })
+    throw createErrorValidation('A senha deve conter pelo menos uma letra maiúscula')
   }
 
   if (!/[a-z]/.test(password)) {
-    throw createError({
-      statusCode: 400,
-      message: 'A senha deve conter pelo menos uma letra minúscula'
-    })
+    throw createErrorValidation('A senha deve conter pelo menos uma letra minúscula')
   }
 
   if (!/[0-9]/.test(password)) {
-    throw createError({ statusCode: 400, message: 'A senha deve conter pelo menos um número' })
+    throw createErrorValidation('A senha deve conter pelo menos um número')
   }
 
   if (!/[!@#$%^&*]/.test(password)) {
-    throw createError({
-      statusCode: 400,
-      message: 'A senha deve conter pelo menos um caractere especial'
-    })
+    throw createErrorValidation('A senha deve conter pelo menos um caractere especial')
   }
 }
 

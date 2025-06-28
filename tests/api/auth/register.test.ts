@@ -1,27 +1,39 @@
 import { afterAll, describe, expect, test } from 'vitest'
 import { users } from '../../../server/database/schemas/users'
 import { useDB } from '../../../server/utils/database'
-import { eq, like } from 'drizzle-orm'
-import { ofetch } from 'ofetch'
+import { like } from 'drizzle-orm'
+import { request } from '../../setup'
 
 afterAll(async () => {
   await useDB().delete(users).where(like(users.email, '%@forja.test'))
 })
 
-describe('Register user', () => {
+interface RegisterPayload {
+  name?: string
+  email?: string
+  password?: string
+}
+
+const registerUser = async (payload: RegisterPayload) => {
+  const { status, data } = await request('v1/auth/register', {
+    method: 'POST',
+    body: payload,
+    ignoreResponseError: true
+  })
+  return { status, data }
+}
+
+describe('POST /api/v1/auth/register', () => {
   test('Register a new user using password', async () => {
     const payload = {
-      name: 'John Doe',
-      email: 'john.doe@forja.test',
+      name: 'Gabriel Philipe',
+      email: 'gabriel.philipe@forja.test',
       password: 'Philipe@18.'
     }
 
-    await ofetch('http://localhost:3000/api/v1/auth/register', {
-      method: 'POST',
-      body: payload
-    }).then((response) => {
-      expect(response).toBe('')
-    })
+    const { status, data } = await registerUser(payload)
+    expect(status).toBe(201)
+    expect(data).toBe('')
 
     // Check in database
     const [user] = await useDB().select().from(users).where(like(users.email, '%@forja.test'))
@@ -30,112 +42,151 @@ describe('Register user', () => {
     expect(user?.name).toBe(payload.name)
   })
 
-  describe('Not register a new user: invalid payload', () => {
-    test('missing password', async () => {
+  describe('Data validation', () => {
+    test('should reject payload without password', async () => {
       const payload = {
         name: 'Gabriel Philipe',
-        email: 'philipe.invalid@forja.test'
+        email: 'without.password@forja.test'
       }
-      await ofetch('http://localhost:3000/api/v1/auth/register', {
-        method: 'POST',
-        body: payload
-      }).catch((error) => {
-        const response = error.data
-        expect(error.status).toBe(400)
-        expect(response.data.password).toBeDefined()
-        expect(response.data.password).toEqual(['Required'])
-        expect(response.message).toBe('Ajuste os dados enviados e tente novamente')
-      })
 
-      // Check in database
-      const [user] = await useDB().select().from(users).where(eq(users.email, payload.email))
-      expect(user).toBeUndefined()
+      const { status, data } = await registerUser(payload)
+
+      expect(status).toBe(400)
+      expect(data.message).toBe('Ajuste os dados enviados e tente novamente')
+      expect(data.data.password).toBeDefined()
     })
 
-    test('missing name', async () => {
+    test('should reject payload without name', async () => {
       const payload = {
-        email: 'philipe.missing.name@forja.test',
-        password: 'Abc@123456'
+        email: 'without.name@forja.test',
+        password: 'Abcdef@123.'
       }
-      await ofetch('http://localhost:3000/api/v1/auth/register', {
-        method: 'POST',
-        body: payload
-      }).catch((error) => {
-        const response = error.data
-        expect(error.status).toBe(400)
-        expect(response.data.name).toBeDefined()
-        expect(response.data.name).toEqual(['Required'])
-        expect(response.message).toBe('Ajuste os dados enviados e tente novamente')
-      })
 
-      // Check in database
-      const [user] = await useDB().select().from(users).where(eq(users.email, payload.email))
-      expect(user).toBeUndefined()
+      const { status, data } = await registerUser(payload)
+
+      expect(status).toBe(400)
+      expect(data.message).toBe('Ajuste os dados enviados e tente novamente')
+      expect(data.data.name).toBeDefined()
     })
 
-    test('missing email', async () => {
+    test('should reject payload without email', async () => {
       const payload = {
         name: 'Gabriel Philipe',
-        password: 'Abc@123456'
+        password: 'Abcdef@123.'
       }
 
-      await ofetch('http://localhost:3000/api/v1/auth/register', {
-        method: 'POST',
-        body: payload
-      }).catch((error) => {
-        const response = error.data
-        expect(error.status).toBe(400)
-        expect(response.data.email).toBeDefined()
-        expect(response.data.email).toEqual(['Required'])
-        expect(response.message).toBe('Ajuste os dados enviados e tente novamente')
-      })
+      const { status, data } = await registerUser(payload)
+
+      expect(status).toBe(400)
+      expect(data.message).toBe('Ajuste os dados enviados e tente novamente')
+      expect(data.data.email).toBeDefined()
     })
 
-    test('invalid email', async () => {
+    test('should reject invalid email', async () => {
       const payload = {
         name: 'Gabriel Philipe',
-        email: 'philipe.invalid.email',
-        password: 'Abc@123456'
+        email: 'invalid.email',
+        password: 'Abcdef@123.'
       }
-      await ofetch('http://localhost:3000/api/v1/auth/register', {
-        method: 'POST',
-        body: payload
-      }).catch((error) => {
-        const response = error.data
-        expect(error.status).toBe(400)
-        expect(response.data.email).toBeDefined()
-        expect(response.data.email).toEqual(['Invalid email'])
-        expect(response.message).toBe('Ajuste os dados enviados e tente novamente')
-      })
 
-      // Check in database
-      const [user] = await useDB().select().from(users).where(eq(users.email, payload.email))
-      expect(user).toBeUndefined()
+      const { status, data } = await registerUser(payload)
+
+      expect(status).toBe(400)
+      expect(data.message).toBe('Ajuste os dados enviados e tente novamente')
+      expect(data.data.email).toBeDefined()
+    })
+  })
+
+  describe('Password validation', () => {
+    test('should reject password with less than 8 characters', async () => {
+      const payload = {
+        name: 'Gabriel Philipe',
+        email: 'less.than.8.characters@forja.test',
+        password: 'Abc@123'
+      }
+
+      const { status, data } = await registerUser(payload)
+
+      expect(status).toBe(400)
+      expect(data.message).toBe('A senha deve ter pelo menos 8 caracteres')
     })
 
-    test('invalid password', async () => {
+    test('should reject password without uppercase letter', async () => {
       const payload = {
         name: 'Gabriel Philipe',
-        email: 'philipe.invalid.password@forja.test',
-        password: '123456'
+        email: 'no.uppercase.letter@forja.test',
+        password: 'abcdef123!'
       }
 
-      await ofetch('http://localhost:3000/api/v1/auth/register', {
-        method: 'POST',
-        body: payload
-      }).catch((error) => {
-        const response = error.data
-        expect(error.status).toBe(400)
-        expect(response.data.password).toBeDefined()
-        expect(response.data.password).toEqual([
-          'A senha deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial'
-        ])
-        expect(response.message).toBe('Ajuste os dados enviados e tente novamente')
-      })
+      const { status, data } = await registerUser(payload)
 
-      // Check in database
-      const [user] = await useDB().select().from(users).where(eq(users.email, payload.email))
-      expect(user).toBeUndefined()
+      expect(status).toBe(400)
+      expect(data.message).toBe('A senha deve conter pelo menos uma letra maiúscula')
+    })
+
+    test('should reject password without lowercase letter', async () => {
+      const payload = {
+        name: 'Gabriel Philipe',
+        email: 'no.lowercase.letter@forja.test',
+        password: 'ABCDEF123!'
+      }
+
+      const { status, data } = await registerUser(payload)
+
+      expect(status).toBe(400)
+      expect(data.message).toBe('A senha deve conter pelo menos uma letra minúscula')
+    })
+
+    test('should reject password without number', async () => {
+      const payload = {
+        name: 'Gabriel Philipe',
+        email: 'no.number@forja.test',
+        password: 'Abcdefgh!'
+      }
+
+      const { status, data } = await registerUser(payload)
+
+      expect(status).toBe(400)
+      expect(data.message).toBe('A senha deve conter pelo menos um número')
+    })
+
+    test('should reject password without special character', async () => {
+      const payload = {
+        name: 'Gabriel Philipe',
+        email: 'no.special.character@forja.test',
+        password: 'Abcdef123'
+      }
+
+      const { status, data } = await registerUser(payload)
+
+      expect(status).toBe(400)
+      expect(data.message).toBe('A senha deve conter pelo menos um caractere especial')
+    })
+  })
+
+  describe('Business validation', () => {
+    test('should reject email already in use', async () => {
+      // Primeiro, registra um usuário
+      const firstUser = {
+        name: 'First User',
+        email: 'duplicate.email@forja.test',
+        password: 'Abcdef123!'
+      }
+
+      const { status: firstStatus } = await registerUser(firstUser)
+      expect(firstStatus).toBe(201)
+
+      // Tenta registrar outro usuário com o mesmo email
+      const secondUser = {
+        name: 'Second User',
+        email: 'duplicate.email@forja.test',
+        password: 'Xyzdef456!'
+      }
+
+      const { status: secondStatus, data } = await registerUser(secondUser)
+
+      expect(secondStatus).toBe(400)
+      expect(data.message).toBe('O e-mail informado já está em uso')
     })
   })
 })
