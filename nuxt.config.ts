@@ -1,3 +1,5 @@
+import { resolve } from 'node:path'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
@@ -9,5 +11,10 @@ export default defineNuxtConfig({
     preset: 'vercel'
   },
 
-  modules: ['@nuxt/eslint', '@nuxt/test-utils/module']
+  modules: ['@nuxt/eslint', '@nuxt/test-utils/module'],
+
+  alias: {
+    '#tests': resolve(__dirname, 'tests'),
+    '#server': resolve(__dirname, 'server')
+  }
 })

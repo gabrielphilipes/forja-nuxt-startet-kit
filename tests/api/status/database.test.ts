@@ -1,4 +1,4 @@
-import { request } from '../../setup'
+import { request } from '#tests/setup'
 import { describe, expect, test } from 'vitest'
 
 describe('GET /api/v1/status/database', () => {

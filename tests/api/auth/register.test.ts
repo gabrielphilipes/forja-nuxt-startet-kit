@@ -1,8 +1,8 @@
 import { afterAll, describe, expect, test } from 'vitest'
-import { users } from '../../../server/database/schemas/users'
-import { useDB } from '../../../server/utils/database'
+import { users } from '#server/database/schemas/users'
+import { useDB } from '#server/utils/database'
 import { like } from 'drizzle-orm'
-import { request } from '../../setup'
+import { request } from '#tests/setup'
 
 afterAll(async () => {
   await useDB().delete(users).where(like(users.email, '%@forja.test'))
