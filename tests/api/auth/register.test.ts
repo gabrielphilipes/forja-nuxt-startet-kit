@@ -27,8 +27,8 @@ describe('POST /api/v1/auth/register', () => {
   test('Register a new user using password', async () => {
     const payload = {
       name: 'Gabriel Philipe',
-      email: 'gabriel.philipe@forja.test',
-      password: 'Philipe@18.'
+      email: 'success.register@forja.test',
+      password: 'Success123!'
     }
 
     const { status, data } = await registerUser(payload)

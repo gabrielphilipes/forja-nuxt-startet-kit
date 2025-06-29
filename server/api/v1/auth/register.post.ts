@@ -1,7 +1,5 @@
 import type { H3Event } from 'h3'
 import user from '#server/models/user'
-import { RegisterUserSchema } from '#server/utils/validations/auth'
-import { createErrorValidation } from '#server/utils/error'
 
 export default defineEventHandler(async (event: H3Event) => {
   const { success, data, error } = await readValidatedBody(event, (body) =>
