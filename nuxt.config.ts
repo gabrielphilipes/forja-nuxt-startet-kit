@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     preset: 'vercel'
   },
 
-  modules: ['@nuxt/eslint', '@nuxt/test-utils/module'],
+  modules: ['@nuxt/eslint', '@nuxt/test-utils/module', 'nuxt-auth-utils'],
 
   alias: {
     '#tests': resolve(__dirname, 'tests'),

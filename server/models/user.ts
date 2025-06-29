@@ -7,7 +7,7 @@ const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   await valideUniqueEmail(user.email)
   await validateStrongPassword(user.password!)
 
-  const hashedPassword = await hashPassword(user.password!)
+  const hashedPassword = await createHashPassword(user.password!)
 
   const newUserData = {
     ...user,
@@ -17,6 +17,26 @@ const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   const [newUser] = await useDB().insert(users).values(newUserData).returning()
 
   return newUser
+}
+
+const loginWithPassword = async (email: string, password: string): Promise<User | null> => {
+  const [user] = await useDB().select().from(users).where(eq(users.email, email))
+
+  if (!user) {
+    throw createError({ statusCode: 401, message: 'Usuário não encontrado' })
+  }
+
+  if (!user.password) {
+    throw createError({ statusCode: 401, message: 'Usuário não possui senha cadastrada' })
+  }
+
+  const isPasswordValid = await verifyHashPassword(password, user.password)
+
+  if (!isPasswordValid) {
+    throw createError({ statusCode: 401, message: 'Senha incorreta' })
+  }
+
+  return user
 }
 
 const valideUniqueEmail = async (email: string): Promise<void> => {
@@ -57,5 +77,6 @@ const validateStrongPassword = async (password: string): Promise<void> => {
 }
 
 export default {
-  createUsingPassword
+  createUsingPassword,
+  loginWithPassword
 }
