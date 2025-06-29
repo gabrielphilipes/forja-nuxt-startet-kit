@@ -1,6 +1,6 @@
 import { LoginUserSchema } from '#server/utils/validations/auth'
-import type { User } from '~~/server/database/schemas/users'
-import user from '~~/server/models/user'
+import type { User } from '#server/database/schemas/users'
+import user from '#server/models/user'
 
 export default defineEventHandler(async (event) => {
   const { success, data, error } = await readValidatedBody(event, (body) =>
