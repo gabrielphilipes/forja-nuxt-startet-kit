@@ -20,13 +20,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Credenciais inválidas' })
   }
 
-  const loginUserData = {
-    id: loginUser?.id,
-    name: loginUser?.name,
-    email: loginUser?.email
+  if (!loginUser) {
+    throw createError({ statusCode: 401, message: 'Credenciais inválidas' })
   }
 
   const sessionName = (process.env.SITE_NAME ?? 'forja')?.toLowerCase().replace(/\s+/g, '-')
+  const loginUserData = user.transformToLogin(loginUser)
 
   await setUserSession(event, loginUserData, { name: `${sessionName}-session` })
 })

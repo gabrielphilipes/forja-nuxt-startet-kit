@@ -1,8 +1,8 @@
 import { afterAll, describe, expect, test } from 'vitest'
 import { users } from '#server/database/schemas/users'
-import { verifyJWTToken } from '#server/utils/auth'
 import { useDB } from '#server/utils/database'
 import { request } from '#tests/setup'
+import user from '#server/models/user'
 import { like } from 'drizzle-orm'
 import * as jose from 'jose'
 
@@ -55,7 +55,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
     expect(typeof data.token).toBe('string')
     expect(data.token.length).toBeGreaterThan(0)
 
-    const decodedToken = await verifyJWTToken(data.token)
+    const decodedToken = await user.verifyJWTToken(data.token)
     expect(decodedToken).not.toBeNull()
     expect(decodedToken?.id).toBeDefined()
     expect(decodedToken?.name).toBe('Test User')
@@ -192,7 +192,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
       expect(status).toBe(200)
       expect(data.token).toBeDefined()
 
-      const decodedToken = await verifyJWTToken(data.token)
+      const decodedToken = await user.verifyJWTToken(data.token)
       expect(decodedToken).not.toBeNull()
 
       const currentTime = Math.floor(Date.now() / 1000)
@@ -218,8 +218,8 @@ describe('POST /api/v1/auth/login-jwt', () => {
 
       expect(data1.token).not.toBe(data2.token)
 
-      const decoded1 = await verifyJWTToken(data1.token)
-      const decoded2 = await verifyJWTToken(data2.token)
+      const decoded1 = await user.verifyJWTToken(data1.token)
+      const decoded2 = await user.verifyJWTToken(data2.token)
 
       expect(decoded1?.id).not.toBe(decoded2?.id)
       expect(decoded1?.email).toBe(user1.email)

@@ -1,6 +1,5 @@
 import { LoginUserSchema } from '#server/utils/validations/auth'
 import type { User } from '#server/database/schemas/users'
-import { generateJWTToken } from '#server/utils/auth'
 import user from '#server/models/user'
 
 export default defineEventHandler(async (event) => {
@@ -25,13 +24,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Credenciais inválidas' })
   }
 
-  const token = await generateJWTToken(loginUser)
+  const token = await user.generateJWTToken(loginUser)
 
-  const loginUserData = {
-    id: loginUser?.id,
-    name: loginUser?.name,
-    email: loginUser?.email
-  }
+  const loginUserData = user.transformToLogin(loginUser)
 
   return {
     token,

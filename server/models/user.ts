@@ -1,7 +1,17 @@
-import { eq } from 'drizzle-orm'
 import { users, type InsertUser, type User } from '#server/database/schemas/users'
-import { useDB } from '#server/utils/database'
 import { createErrorValidation } from '#server/utils/error'
+import { useDB } from '#server/utils/database'
+import { eq } from 'drizzle-orm'
+import * as jose from 'jose'
+
+interface UserLogin {
+  id: string
+  name: string
+  email: string
+  exp?: number
+}
+
+const secret = Buffer.from(process.env.NUXT_SESSION_PASSWORD!, 'utf-8')
 
 const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   await valideUniqueEmail(user.email)
@@ -76,7 +86,39 @@ const validateStrongPassword = async (password: string): Promise<void> => {
   }
 }
 
+const transformToLogin = (user: User): UserLogin => {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email
+  }
+}
+
+export const generateJWTToken = async (user: User): Promise<string> => {
+  const payload = transformToLogin(user)
+
+  const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('1 week')
+    .sign(secret)
+
+  return token
+}
+
+export const verifyJWTToken = async (token: string): Promise<UserLogin | null> => {
+  try {
+    const { payload } = await jose.jwtVerify(token, secret)
+    return payload as unknown as UserLogin
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
 export default {
   createUsingPassword,
-  loginWithPassword
+  loginWithPassword,
+  transformToLogin,
+  generateJWTToken,
+  verifyJWTToken
 }
