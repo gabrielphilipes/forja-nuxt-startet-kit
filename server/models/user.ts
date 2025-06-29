@@ -7,7 +7,14 @@ const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   await valideUniqueEmail(user.email)
   await validateStrongPassword(user.password!)
 
-  const [newUser] = await useDB().insert(users).values(user).returning()
+  const hashedPassword = await hashPassword(user.password!)
+
+  const newUserData = {
+    ...user,
+    password: hashedPassword
+  }
+
+  const [newUser] = await useDB().insert(users).values(newUserData).returning()
 
   return newUser
 }
