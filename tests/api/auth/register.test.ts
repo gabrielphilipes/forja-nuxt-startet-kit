@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, test } from 'vitest'
 import { users } from '#server/database/schemas/users'
 import { useDB } from '#server/utils/database'
-import { like } from 'drizzle-orm'
+import { eq, like } from 'drizzle-orm'
 import { request } from '#tests/setup'
 
 afterAll(async () => {
@@ -36,7 +36,7 @@ describe('POST /api/v1/auth/register', () => {
     expect(data).toBe('')
 
     // Check in database
-    const [user] = await useDB().select().from(users).where(like(users.email, '%@forja.test'))
+    const [user] = await useDB().select().from(users).where(eq(users.email, payload.email))
     expect(user).toBeDefined()
     expect(user?.email).toBe(payload.email)
     expect(user?.name).toBe(payload.name)
