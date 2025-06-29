@@ -1,13 +1,13 @@
+import { request } from '#tests/setup'
 import { describe, expect, test } from 'vitest'
 
-describe('Check database status', () => {
-  test('retrieving current system status', async () => {
-    const request = await fetch('http://localhost:3000/api/v1/status/database')
-    const body = await request.json()
+describe('GET /api/v1/status/database', () => {
+  test('should return database status information', async () => {
+    const { status, data } = await request('v1/status/database')
 
-    expect(request.status).toBe(200)
-    expect(body.database.version).toBe('17.4')
-    expect(body.database.max_connections).toBe(100)
-    expect(body.database.opened_connections).toBe(1)
+    expect(status).toBe(200)
+    expect(data.database.version).toBe('17.4')
+    expect(data.database.max_connections).toBe(100)
+    expect(data.database.opened_connections).toBe(1)
   })
 })
