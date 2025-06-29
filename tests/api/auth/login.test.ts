@@ -21,7 +21,7 @@ const loginUser = async (payload: LoginPayload) => {
 }
 
 const createTestUser = async (payload: LoginPayload) => {
-  const { status, data } = await request('v1/auth/register', {
+  const { status } = await request('v1/auth/register', {
     method: 'POST',
     body: {
       name: 'Test User',
@@ -29,10 +29,6 @@ const createTestUser = async (payload: LoginPayload) => {
       password: payload.password
     }
   })
-
-  if (status !== 201) {
-    console.error(data)
-  }
 
   return status === 201
 }
