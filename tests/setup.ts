@@ -2,7 +2,7 @@ import { config } from 'dotenv'
 import { resolve } from 'path'
 import { ofetch, type FetchOptions } from 'ofetch'
 
-config({ path: resolve(process.cwd(), '.env') })
+config({ path: resolve(process.cwd(), '.env'), quiet: true, debug: false })
 
 export const request = async (url: string, options: FetchOptions = {}) => {
   options.ignoreResponseError = true
