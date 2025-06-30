@@ -49,6 +49,16 @@ const loginWithPassword = async (email: string, password: string): Promise<User 
   return user
 }
 
+const findByEmail = async (email: string): Promise<User | null> => {
+  try {
+    const [user] = await useDB().select().from(users).where(eq(users.email, email))
+    return user
+  } catch (error) {
+    console.error(error)
+    throw createError({ statusCode: 500, message: 'Erro interno ao buscar usuário' })
+  }
+}
+
 const valideUniqueEmail = async (email: string): Promise<void> => {
   let user: User[] = []
 
@@ -120,5 +130,6 @@ export default {
   loginWithPassword,
   transformToLogin,
   generateJWTToken,
-  verifyJWTToken
+  verifyJWTToken,
+  findByEmail
 }
