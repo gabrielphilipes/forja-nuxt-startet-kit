@@ -7,7 +7,7 @@ import { like } from 'drizzle-orm'
 import * as jose from 'jose'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@forja.test'))
+  await useDB().delete(users).where(like(users.email, '%@refresh-jwt.forja.test'))
 })
 
 interface LoginJWTPayload {
@@ -51,7 +51,7 @@ const createTestUser = async (payload: LoginJWTPayload): Promise<boolean> => {
 describe('POST /api/v1/auth/refresh-jwt', () => {
   test('should refresh JWT token with valid token', async () => {
     const loginPayload = {
-      email: 'valid.refresh@forja.test',
+      email: 'valid.refresh@refresh-jwt.forja.test',
       password: 'ValidPass123!'
     }
 
@@ -130,7 +130,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
       const expiredToken = await new jose.SignJWT({
         id: 'test-id',
         name: 'Test User',
-        email: 'expired.token@forja.test'
+        email: 'expired.token@refresh-jwt.forja.test'
       })
         .setProtectedHeader({ alg: 'HS256' })
         .setExpirationTime('1 second ago')
@@ -147,7 +147,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
 
     test('should reject token with wrong signature', async () => {
       const loginPayload = {
-        email: 'wrong.signature@forja.test',
+        email: 'wrong.signature@refresh-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -175,7 +175,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
       const invalidToken = await new jose.SignJWT({
         id: 'non-existent-id',
         name: 'Invalid User',
-        email: 'invalid.user@forja.test'
+        email: 'invalid.user@refresh-jwt.forja.test'
       })
         .setProtectedHeader({ alg: 'HS256' })
         .setExpirationTime('1 week')
@@ -194,7 +194,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
   describe('JWT Token validation', () => {
     test('should return new token with correct expiration time', async () => {
       const loginPayload = {
-        email: 'expiration.refresh@forja.test',
+        email: 'expiration.refresh@refresh-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -221,12 +221,12 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
 
     test('should return different tokens for different users', async () => {
       const user1 = {
-        email: 'user1.refresh@forja.test',
+        email: 'user1.refresh@refresh-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
       const user2 = {
-        email: 'user2.refresh@forja.test',
+        email: 'user2.refresh@refresh-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -251,7 +251,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
 
     test('should return token with proper JWT structure', async () => {
       const loginPayload = {
-        email: 'structure.refresh@forja.test',
+        email: 'structure.refresh@refresh-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -278,7 +278,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
   describe('Security validation', () => {
     test('should return token that can be verified with correct secret', async () => {
       const loginPayload = {
-        email: 'secret.refresh@forja.test',
+        email: 'secret.refresh@refresh-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -304,7 +304,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
 
     test('should reject token verification with wrong secret', async () => {
       const loginPayload = {
-        email: 'wrong.secret.refresh@forja.test',
+        email: 'wrong.secret.refresh@refresh-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -334,7 +334,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
 
     test('should maintain user data consistency after refresh', async () => {
       const loginPayload = {
-        email: 'consistency@forja.test',
+        email: 'consistency@refresh-jwt.forja.test',
         password: 'ValidPass123!'
       }
 

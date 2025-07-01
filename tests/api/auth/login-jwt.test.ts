@@ -7,7 +7,7 @@ import { like } from 'drizzle-orm'
 import * as jose from 'jose'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@forja.test'))
+  await useDB().delete(users).where(like(users.email, '%@login-jwt.forja.test'))
 })
 
 interface LoginJWTPayload {
@@ -39,7 +39,7 @@ const createTestUser = async (payload: LoginJWTPayload): Promise<boolean> => {
 describe('POST /api/v1/auth/login-jwt', () => {
   test('should login with valid credentials and return JWT token', async () => {
     const payload = {
-      email: 'valid.jwt.login@forja.test',
+      email: 'valid.jwt.login@login-jwt.forja.test',
       password: 'ValidPass123!'
     }
 
@@ -74,7 +74,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
   describe('Data validation', () => {
     test('should reject payload without password', async () => {
       const payload = {
-        email: 'without.password.jwt@forja.test'
+        email: 'without.password.jwt@login-jwt.forja.test'
       }
       const { status, data } = await loginUserJWT(payload)
       expect(status).toBe(400)
@@ -107,7 +107,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
   describe('Authentication validation', () => {
     test('should reject login with non-existent email', async () => {
       const payload = {
-        email: 'nonexistent.jwt@forja.test',
+        email: 'nonexistent.jwt@login-jwt.forja.test',
         password: 'Abcdef123!'
       }
 
@@ -119,7 +119,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
     })
 
     test('should reject login with wrong password', async () => {
-      const email = 'wrong.password.jwt@forja.test'
+      const email = 'wrong.password.jwt@login-jwt.forja.test'
       const correctPassword = 'CorrectPass123!'
       const wrongPassword = 'WrongPass123!'
 
@@ -142,7 +142,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
     })
 
     test('should reject login with empty password', async () => {
-      const email = 'empty.password.jwt@forja.test'
+      const email = 'empty.password.jwt@login-jwt.forja.test'
       const password = 'ValidPass123!'
 
       const userCreated = await createTestUser({
@@ -180,7 +180,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
   describe('JWT Token validation', () => {
     test('should return token with correct expiration time', async () => {
       const payload = {
-        email: 'expiration.jwt@forja.test',
+        email: 'expiration.jwt@login-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -201,12 +201,12 @@ describe('POST /api/v1/auth/login-jwt', () => {
 
     test('should return different tokens for different users', async () => {
       const user1 = {
-        email: 'user1.jwt@forja.test',
+        email: 'user1.jwt@login-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
       const user2 = {
-        email: 'user2.jwt@forja.test',
+        email: 'user2.jwt@login-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -228,7 +228,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
 
     test('should return token with proper JWT structure', async () => {
       const payload = {
-        email: 'structure.jwt@forja.test',
+        email: 'structure.jwt@login-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -249,7 +249,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
   describe('Security validation', () => {
     test('should return token that can be verified with correct secret', async () => {
       const payload = {
-        email: 'secret.jwt@forja.test',
+        email: 'secret.jwt@login-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
@@ -269,7 +269,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
 
     test('should reject token verification with wrong secret', async () => {
       const payload = {
-        email: 'wrong.secret.jwt@forja.test',
+        email: 'wrong.secret.jwt@login-jwt.forja.test',
         password: 'ValidPass123!'
       }
 
