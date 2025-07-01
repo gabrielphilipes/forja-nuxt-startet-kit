@@ -29,6 +29,27 @@ const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   return newUser
 }
 
+const createUsingOAuth = async (
+  user: Omit<
+    InsertUser,
+    'id' | 'password' | 'email_verified_at' | 'created_at' | 'updated_at' | 'last_activity'
+  >
+): Promise<User> => {
+  await valideUniqueEmail(user.email)
+
+  try {
+    const newUserData = user
+    newUserData.email = newUserData.email.toLowerCase() // Ensure email is always lowercase
+
+    const [newUser] = await useDB().insert(users).values(newUserData).returning()
+
+    return newUser
+  } catch (error) {
+    console.error(error)
+    throw createError({ statusCode: 500, message: 'Erro interno ao criar usuário' })
+  }
+}
+
 const loginWithPassword = async (email: string, password: string): Promise<User | null> => {
   const [user] = await useDB().select().from(users).where(eq(users.email, email))
 
@@ -96,9 +117,9 @@ const validateStrongPassword = async (password: string): Promise<void> => {
   }
 }
 
-const transformToLogin = (user: User): UserLogin => {
+const transformToLogin = (user: User | InsertUser): UserLogin => {
   return {
-    id: user.id,
+    id: user.id!,
     name: user.name,
     email: user.email
   }
@@ -144,5 +165,6 @@ export default {
   generateJWTToken,
   verifyJWTToken,
   findByEmail,
-  invalidateJWTToken
+  invalidateJWTToken,
+  createUsingOAuth
 }
