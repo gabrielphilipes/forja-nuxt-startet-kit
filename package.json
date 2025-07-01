@@ -1,5 +1,24 @@
 {
-  "name": "nuxt-app",
+  "name": "Forja",
+  "license": "MIT",
+  "author": {
+    "name": "Gabriel Philipe Silva",
+    "email": "gabriel@philipe.dev",
+    "url": "https://philipe.dev"
+  },
+  "description": "Kit inicial para SaaS com Nuxt.js",
+  "keywords": [
+    "nuxt",
+    "template",
+    "saas",
+    "kit",
+    "initial",
+    "starter",
+    "forja",
+    "forja-kit",
+    "nuxt-app",
+    "nuxt-template"
+  ],
   "private": true,
   "type": "module",
   "scripts": {
