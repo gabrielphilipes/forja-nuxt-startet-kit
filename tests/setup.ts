@@ -1,8 +1,16 @@
-import { config } from 'dotenv'
-import { resolve } from 'path'
 import { ofetch, type FetchOptions } from 'ofetch'
+import { useStorage, clearStorage } from './mocks/storage'
 
-config({ path: resolve(process.cwd(), '.env'), quiet: true, debug: false })
+// Mock global do useStorage para os testes
+Object.defineProperty(global, 'useStorage', {
+  value: useStorage,
+  writable: true
+})
+
+// Função para limpar o storage entre testes
+export const clearTestStorage = () => {
+  clearStorage()
+}
 
 export const request = async (url: string, options: FetchOptions = {}) => {
   options.ignoreResponseError = true
