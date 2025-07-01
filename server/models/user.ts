@@ -1,7 +1,17 @@
-import { eq } from 'drizzle-orm'
 import { users, type InsertUser, type User } from '#server/database/schemas/users'
-import { useDB } from '#server/utils/database'
 import { createErrorValidation } from '#server/utils/error'
+import { useDB } from '#server/utils/database'
+import { eq } from 'drizzle-orm'
+import * as jose from 'jose'
+
+interface UserLogin {
+  id: string
+  name: string
+  email: string
+  exp?: number
+}
+
+const secret = Buffer.from(process.env.NUXT_SESSION_PASSWORD!, 'utf-8')
 
 const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   await valideUniqueEmail(user.email)
@@ -37,6 +47,16 @@ const loginWithPassword = async (email: string, password: string): Promise<User 
   }
 
   return user
+}
+
+const findByEmail = async (email: string): Promise<User | null> => {
+  try {
+    const [user] = await useDB().select().from(users).where(eq(users.email, email))
+    return user
+  } catch (error) {
+    console.error(error)
+    throw createError({ statusCode: 500, message: 'Erro interno ao buscar usuário' })
+  }
 }
 
 const valideUniqueEmail = async (email: string): Promise<void> => {
@@ -76,7 +96,53 @@ const validateStrongPassword = async (password: string): Promise<void> => {
   }
 }
 
+const transformToLogin = (user: User): UserLogin => {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email
+  }
+}
+
+const generateJWTToken = async (user: User): Promise<string> => {
+  const payload = transformToLogin(user)
+
+  const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('1 week')
+    .sign(secret)
+
+  return token
+}
+
+const verifyJWTToken = async (token: string): Promise<UserLogin | null> => {
+  const blacklist = ((await useStorage().getItem('jwt-blacklist')) as string[]) || []
+
+  if (blacklist.includes(token)) {
+    throw createError({ statusCode: 401, message: 'Token expirado ou inválido' })
+  }
+
+  try {
+    const { payload } = await jose.jwtVerify(token, secret)
+    return payload as unknown as UserLogin
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+const invalidateJWTToken = async (token: string): Promise<void> => {
+  const blacklist = ((await useStorage().getItem('jwt-blacklist')) as string[]) || []
+  blacklist.push(token)
+  await useStorage().setItem('jwt-blacklist', blacklist)
+}
+
 export default {
   createUsingPassword,
-  loginWithPassword
+  loginWithPassword,
+  transformToLogin,
+  generateJWTToken,
+  verifyJWTToken,
+  findByEmail,
+  invalidateJWTToken
 }

@@ -1,9 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool, type QueryResult } from 'pg'
-import { config } from 'dotenv'
-import { resolve } from 'path'
-
-config({ path: resolve(process.cwd(), '.env'), quiet: true, debug: false })
 
 export const dbCredentials = {
   host: process.env.POSTGRES_HOST!,

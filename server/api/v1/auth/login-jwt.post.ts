@@ -24,8 +24,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Credenciais inválidas' })
   }
 
-  const sessionName = (process.env.SITE_NAME ?? 'forja')?.toLowerCase().replace(/\s+/g, '-')
+  const token = await user.generateJWTToken(loginUser)
+
   const loginUserData = user.transformToLogin(loginUser)
 
-  await setUserSession(event, loginUserData, { name: `${sessionName}-session` })
+  return {
+    token,
+    user: loginUserData
+  }
 })
