@@ -10,25 +10,25 @@ export default defineEventHandler(async (event) => {
     throw createErrorValidation('Ajuste os dados enviados e tente novamente', error)
   }
 
-  // Verificar se o token é válido
-  const decodedToken = await user.verifyJWTToken(data.token)
+  // Check if the token is valid
+  const oldToken = data.token
+  const decodedToken = await user.verifyJWTToken(oldToken)
 
   if (!decodedToken) {
     throw createError({ statusCode: 401, message: 'Token expirado ou inválido' })
   }
 
-  // Verificar se o usuário ainda existe no banco de dados
+  // Check if the user still exists in the database
   const currentUser = await user.findByEmail(decodedToken.email)
 
   if (!currentUser) {
     throw createError({ statusCode: 401, message: 'Usuário não encontrado' })
   }
 
-  // Gerar novo token
   const newToken = await user.generateJWTToken(currentUser)
-
-  // Transformar dados do usuário para resposta
   const userData = user.transformToLogin(currentUser)
+
+  await user.invalidateJWTToken(oldToken)
 
   return {
     token: newToken,

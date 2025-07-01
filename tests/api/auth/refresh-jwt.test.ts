@@ -1,7 +1,7 @@
-import { afterAll, describe, expect, test } from 'vitest'
+import { afterAll, beforeEach, afterEach, describe, expect, test } from 'vitest'
 import { users } from '#server/database/schemas/users'
 import { useDB } from '#server/utils/database'
-import { request } from '#tests/setup'
+import { request, clearTestStorage } from '#tests/setup'
 import user from '#server/models/user'
 import { like } from 'drizzle-orm'
 import * as jose from 'jose'
@@ -49,6 +49,14 @@ const createTestUser = async (payload: LoginJWTPayload): Promise<boolean> => {
 }
 
 describe('POST /api/v1/auth/refresh-jwt', () => {
+  beforeEach(() => {
+    clearTestStorage()
+  })
+
+  afterEach(() => {
+    clearTestStorage()
+  })
+
   test('should refresh JWT token with valid token', async () => {
     const loginPayload = {
       email: 'valid.refresh@refresh-jwt.forja.test',
@@ -329,8 +337,48 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
   })
 
   describe('Business logic validation', () => {
-    // TODO: Implement this test
-    // test('should invalidate old token after refresh', async () => {})
+    test('should invalidate old token after refresh', async () => {
+      const loginPayload = {
+        email: 'invalidate.refresh@refresh-jwt.forja.test',
+        password: 'ValidPass123!'
+      }
+
+      const userCreated = await createTestUser(loginPayload)
+      expect(userCreated).toBe(true)
+
+      const { data: loginData } = await loginUserJWT(loginPayload)
+      const originalToken = loginData.token
+
+      // Verificar que o token original é válido
+      const originalDecoded = await user.verifyJWTToken(originalToken)
+      expect(originalDecoded).not.toBeNull()
+      expect(originalDecoded?.email).toBe(loginPayload.email)
+
+      // Fazer refresh do token
+      const refreshPayload = {
+        token: originalToken
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const { status, data } = await refreshJWT(refreshPayload)
+
+      expect(status).toBe(200)
+      expect(data.token).toBeDefined()
+      expect(data.token).not.toBe(originalToken)
+
+      // Verificar que o novo token é válido
+      const newDecoded = await user.verifyJWTToken(data.token)
+      expect(newDecoded).not.toBeNull()
+      expect(newDecoded?.email).toBe(loginPayload.email)
+
+      // Verificar que o token original foi invalidado
+      const payloadWithInvalidatedToken = { token: originalToken }
+      const { status: invalidatedStatus, data: invalidatedData } = await refreshJWT(
+        payloadWithInvalidatedToken
+      )
+      expect(invalidatedStatus).toBe(401)
+      expect(invalidatedData.message).toBe('Token expirado ou inválido')
+    })
 
     test('should maintain user data consistency after refresh', async () => {
       const loginPayload = {

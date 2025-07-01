@@ -104,7 +104,7 @@ const transformToLogin = (user: User): UserLogin => {
   }
 }
 
-export const generateJWTToken = async (user: User): Promise<string> => {
+const generateJWTToken = async (user: User): Promise<string> => {
   const payload = transformToLogin(user)
 
   const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
@@ -115,7 +115,13 @@ export const generateJWTToken = async (user: User): Promise<string> => {
   return token
 }
 
-export const verifyJWTToken = async (token: string): Promise<UserLogin | null> => {
+const verifyJWTToken = async (token: string): Promise<UserLogin | null> => {
+  const blacklist = ((await useStorage().getItem('jwt-blacklist')) as string[]) || []
+
+  if (blacklist.includes(token)) {
+    throw createError({ statusCode: 401, message: 'Token expirado ou inválido' })
+  }
+
   try {
     const { payload } = await jose.jwtVerify(token, secret)
     return payload as unknown as UserLogin
@@ -125,11 +131,18 @@ export const verifyJWTToken = async (token: string): Promise<UserLogin | null> =
   }
 }
 
+const invalidateJWTToken = async (token: string): Promise<void> => {
+  const blacklist = ((await useStorage().getItem('jwt-blacklist')) as string[]) || []
+  blacklist.push(token)
+  await useStorage().setItem('jwt-blacklist', blacklist)
+}
+
 export default {
   createUsingPassword,
   loginWithPassword,
   transformToLogin,
   generateJWTToken,
   verifyJWTToken,
-  findByEmail
+  findByEmail,
+  invalidateJWTToken
 }
