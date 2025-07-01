@@ -1,7 +1,7 @@
-import { afterAll, beforeEach, afterEach, describe, expect, test } from 'vitest'
+import { afterAll, describe, expect, test } from 'vitest'
 import { users } from '#server/database/schemas/users'
 import { useDB } from '#server/utils/database'
-import { request, clearTestStorage } from '#tests/setup'
+import { request } from '#tests/setup'
 import user from '#server/models/user'
 import { like } from 'drizzle-orm'
 import * as jose from 'jose'
@@ -49,14 +49,6 @@ const createTestUser = async (payload: LoginJWTPayload): Promise<boolean> => {
 }
 
 describe('POST /api/v1/auth/refresh-jwt', () => {
-  beforeEach(() => {
-    clearTestStorage()
-  })
-
-  afterEach(() => {
-    clearTestStorage()
-  })
-
   test('should refresh JWT token with valid token', async () => {
     const loginPayload = {
       email: 'valid.refresh@refresh-jwt.forja.test',
