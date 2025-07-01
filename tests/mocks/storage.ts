@@ -1,4 +1,4 @@
-// Mock para useStorage nos testes
+// Mock to useStorage in tests
 const storage = new Map<string, unknown>()
 
 export const useStorage = () => {
@@ -16,9 +16,4 @@ export const useStorage = () => {
       storage.clear()
     }
   }
-}
-
-// Função para limpar o storage entre testes
-export const clearStorage = () => {
-  storage.clear()
 }

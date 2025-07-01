@@ -1,5 +1,5 @@
 import { ofetch, type FetchOptions } from 'ofetch'
-import { useStorage, clearStorage } from './mocks/storage'
+import { useStorage } from './mocks/storage'
 import { beforeAll } from 'vitest'
 import retry from 'async-retry'
 
@@ -24,17 +24,6 @@ beforeAll(async () => {
   await waitForWebServer()
 }, 30000)
 
-// Mock global do useStorage para os testes
-Object.defineProperty(global, 'useStorage', {
-  value: useStorage,
-  writable: true
-})
-
-// Função para limpar o storage entre testes
-export const clearTestStorage = () => {
-  clearStorage()
-}
-
 export const request = async (url: string, options: FetchOptions = {}) => {
   options.ignoreResponseError = true
 
@@ -47,3 +36,9 @@ export const request = async (url: string, options: FetchOptions = {}) => {
     all: request
   }
 }
+
+// Mock global useStorage for tests
+Object.defineProperty(global, 'useStorage', {
+  value: useStorage,
+  writable: true
+})
