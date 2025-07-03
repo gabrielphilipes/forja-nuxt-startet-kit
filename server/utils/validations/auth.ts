@@ -14,3 +14,7 @@ export const LoginUserSchema = z.object({
 export const RefreshJWTSchema = z.object({
   token: z.string().min(1, 'Token é obrigatório')
 })
+
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email().max(255)
+})

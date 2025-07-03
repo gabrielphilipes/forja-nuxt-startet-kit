@@ -158,6 +158,19 @@ const invalidateJWTToken = async (token: string): Promise<void> => {
   await useStorage().setItem('jwt-blacklist', blacklist)
 }
 
+const resetPassword = async (user: User): Promise<void> => {
+  // Create token
+  const tokenPayload = {
+    email: user.email,
+    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 1 // 1 hour
+  }
+
+  encrypt(JSON.stringify(tokenPayload))
+
+  // TODO: Send email with token
+  // Return success
+}
+
 export default {
   createUsingPassword,
   loginWithPassword,
@@ -166,5 +179,6 @@ export default {
   verifyJWTToken,
   findByEmail,
   invalidateJWTToken,
-  createUsingOAuth
+  createUsingOAuth,
+  resetPassword
 }
