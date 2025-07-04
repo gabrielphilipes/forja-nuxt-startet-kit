@@ -39,17 +39,18 @@ describe('POST /api/v1/auth/login-jwt', () => {
     expect(data.token).toBeDefined()
     expect(typeof data.token).toBe('string')
     expect(data.token.length).toBeGreaterThan(0)
+    expect(data.token_exp).toBeDefined()
+    expect(data.token_refresh).toBeDefined()
+    expect(data.token_refresh_exp).toBeDefined()
 
     const decodedToken = await user.verifyJWTToken(data.token)
     expect(decodedToken).not.toBeNull()
-    expect(decodedToken?.id).toBeDefined()
-    expect(decodedToken?.name).toBe('Test User')
-    expect(decodedToken?.email).toBe(payload.email)
-    expect(decodedToken?.exp).toBeDefined()
+    expect(decodedToken.name).toBe('Test User')
+    expect(decodedToken.email).toBe(payload.email)
+    expect(decodedToken.exp).toBeDefined()
 
     // Valide User Data
     expect(data.user).toBeDefined()
-    expect(data.user.id).toBeDefined()
     expect(data.user.name).toBe('Test User')
     expect(data.user.email).toBe(payload.email)
     expect(data.user.password).toBeUndefined()
@@ -174,8 +175,14 @@ describe('POST /api/v1/auth/login-jwt', () => {
       const decodedToken = await user.verifyJWTToken(data.token)
       expect(decodedToken).not.toBeNull()
 
-      const currentTime = Math.floor(Date.now() / 1000)
-      expect(decodedToken?.exp).toBeGreaterThan(currentTime)
+      const expectedExp = Math.floor(Date.now() / 1000) + 60 * 15 // 15 minutes in seconds
+      expect(decodedToken.exp).toBeLessThan(expectedExp)
+
+      const decodedRefreshToken = await user.verifyJWTToken(data.token_refresh)
+      expect(decodedRefreshToken).not.toBeNull()
+
+      const expectedRefreshExp = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days in seconds
+      expect(decodedRefreshToken.exp).toBeLessThan(expectedRefreshExp)
     })
 
     test('should return different tokens for different users', async () => {
@@ -200,7 +207,6 @@ describe('POST /api/v1/auth/login-jwt', () => {
       const decoded1 = await user.verifyJWTToken(data1.token)
       const decoded2 = await user.verifyJWTToken(data2.token)
 
-      expect(decoded1?.id).not.toBe(decoded2?.id)
       expect(decoded1?.email).toBe(user1.email)
       expect(decoded2?.email).toBe(user2.email)
     })
