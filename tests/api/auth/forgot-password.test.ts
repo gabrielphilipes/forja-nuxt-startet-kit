@@ -1,13 +1,15 @@
+import { OAuthProvider, usersOAuth } from '#server/database/schemas/users_oauth'
 import { afterAll, describe, expect, test } from 'vitest'
 import { users } from '#server/database/schemas/users'
 import { useDB } from '#server/utils/database'
-import { like, eq } from 'drizzle-orm'
-import { getTokenByResetPasswordFromEmail, request } from '#tests/setup'
-import { OAuthProvider, usersOAuth } from '#server/database/schemas/users_oauth'
+import mailcrab from '#tests/utils/mailcrab'
+import userTest from '#tests/utils/user'
+import { request } from '#tests/setup'
+import { eq } from 'drizzle-orm'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@forgot-password.forja.test'))
-  await useDB().delete(users).where(like(users.email, '%@reset-password.forja.test'))
+  await userTest.deleteLikedEmails('%@forgot-password.forja.test')
+  await userTest.deleteLikedEmails('%@reset-password.forja.test')
 })
 
 interface ForgotPasswordPayload {
@@ -41,61 +43,24 @@ const resetPassword = async (payload: ResetPasswordPayload) => {
   return { status, data }
 }
 
-// Função para buscar e-mails no mailcrab
-const getMailcrabEmails = async (email: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  const mailcrabPort = process.env.MAILCRAB_PORT || '1080'
-  const response = await fetch(`http://localhost:${mailcrabPort}/api/messages`)
-
-  if (!response.ok) {
-    throw new Error('Falha ao buscar e-mails do mailcrab')
-  }
-
-  const messages = await response.json()
-
-  return messages.filter((msg: { envelope_recipients: string[] }) =>
-    msg.envelope_recipients.includes(email)
-  )
-}
-
-const getMailcrabEmailById = async (id: string) => {
-  const mailcrabPort = process.env.MAILCRAB_PORT || '1080'
-  const response = await fetch(`http://localhost:${mailcrabPort}/api/message/${id}`)
-  return response.json()
-}
-
-// Create a test user
-const createTestUser = async (email: string, password: string = 'ValidPass123!') => {
-  const { status } = await request('v1/auth/register', {
-    method: 'POST',
-    body: {
-      name: 'Test User',
-      email,
-      password
-    }
-  })
-  return status === 201
-}
-
 describe('POST /api/v1/auth/forgot-password', () => {
-  describe('Solicitação de recuperação de senha', () => {
+  describe('Password recovery request', () => {
     test('should send password reset email for existing user', async () => {
       const email = 'existing.user@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       const { status } = await requestPasswordReset({ email })
 
       expect(status).toBe(204)
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
       const resetEmail = emails[0]
       expect(resetEmail.subject).toContain(`Recupere sua senha Test User`)
 
-      const emailContent = await getMailcrabEmailById(resetEmail.id)
+      const emailContent = await mailcrab.getEmailById(resetEmail.id)
       expect(emailContent.html).toContain(`/alterar-senha?token=`)
     })
 
@@ -106,13 +71,13 @@ describe('POST /api/v1/auth/forgot-password', () => {
 
       expect(status).toBe(204)
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBe(0)
     })
 
     test('should handle multiple requests for same email', async () => {
       const email = 'multiple.requests@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       // First request
@@ -124,12 +89,12 @@ describe('POST /api/v1/auth/forgot-password', () => {
       expect(secondStatus).toBe(204)
 
       // Verify that both emails were sent
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThanOrEqual(2)
     })
   })
 
-  describe('Validação de dados', () => {
+  describe('Validation of data', () => {
     test('should reject request without email', async () => {
       const { status, data } = await requestPasswordReset({})
 
@@ -163,12 +128,12 @@ describe('POST /api/v1/auth/forgot-password', () => {
     })
   })
 
-  describe('Validação de segurança', () => {
+  describe('Security validation', () => {
     test('should not reveal if email exists in database', async () => {
       const existingEmail = 'security.existing@forgot-password.forja.test'
       const nonExistingEmail = 'security.nonexistent@forgot-password.forja.test'
 
-      await createTestUser(existingEmail)
+      await userTest.register(existingEmail)
 
       const { status: existingStatus, data: existingData } = await requestPasswordReset({
         email: existingEmail
@@ -185,7 +150,7 @@ describe('POST /api/v1/auth/forgot-password', () => {
 
     test('should handle email with different case sensitivity', async () => {
       const email = 'CaseSensitive@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       // Test with different case variations
@@ -204,18 +169,19 @@ describe('POST /api/v1/auth/forgot-password', () => {
 })
 
 describe('POST /api/v1/auth/reset-password', () => {
-  describe('Reset de senha com token válido', () => {
+  // describe('Reset de senha com token válido', () => {
+  describe('Reset password with valid token', () => {
     test('should reset password with valid token', async () => {
       const email = 'valid.reset@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const newPassword = 'NewPassword123!'
       const { status } = await resetPassword({
@@ -240,15 +206,15 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password shorter than 8 characters', async () => {
       const email = 'short.password@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -263,15 +229,15 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password without uppercase letter', async () => {
       const email = 'no.uppercase.letter@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -286,15 +252,15 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password without lowercase letter', async () => {
       const email = 'no.lowercase.letter@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -309,15 +275,15 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password without number', async () => {
       const email = 'no.number@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -332,15 +298,15 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password without special character', async () => {
       const email = 'no.special.character@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -354,7 +320,7 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
   })
 
-  describe('Validação de dados do reset', () => {
+  describe('Validation of reset data', () => {
     test('should reject reset without token', async () => {
       const { status, data } = await resetPassword({
         email: 'reset.without.token@reset-password.forja.test',
@@ -393,15 +359,15 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject when password and confirmation do not match', async () => {
       const email = 'password.validation.mismatch@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -415,7 +381,7 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
   })
 
-  describe('Validação de token', () => {
+  describe('Token validation', () => {
     test('should reject invalid token', async () => {
       const { status, data } = await resetPassword({
         email: 'invalid.token@reset-password.forja.test',
@@ -430,15 +396,15 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject expired token', async () => {
       const email = 'expired.token@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email }, 1)
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -452,16 +418,16 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
 
     test('should reject already used token', async () => {
-      const email = 'used.token@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const email = 'used.token@reset-password.forja.test'
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       // First attempt (should work)
       const { status: firstStatus } = await resetPassword({
@@ -486,7 +452,7 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
   })
 
-  describe('Validação de segurança do reset', () => {
+  describe('Security validation of reset', () => {
     test('should not allow reset for OAuth-only users', async () => {
       const email = 'oauth.only@reset-password.forja.test'
 
@@ -523,16 +489,16 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
 
     test('should handle concurrent reset attempts', async () => {
-      const email = 'concurrent.reset@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const email = 'concurrent.reset@reset-password.forja.test'
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       // Simulate concurrent attempts
       const promises = [

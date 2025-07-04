@@ -1,12 +1,13 @@
-import { afterAll, describe, expect, test } from 'vitest'
-import { request } from '#tests/setup'
-import { users } from '#server/database/schemas/users'
 import { usersOAuth, OAuthProvider } from '#server/database/schemas/users_oauth'
+import { afterAll, describe, expect, test } from 'vitest'
+import { users } from '#server/database/schemas/users'
 import { useDB } from '#server/utils/database'
-import { like, and, eq } from 'drizzle-orm'
+import userTest from '#tests/utils/user'
+import { request } from '#tests/setup'
+import { and, eq } from 'drizzle-orm'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@oauth.forja.test'))
+  await userTest.deleteLikedEmails('%@oauth.forja.test')
 })
 
 interface OAuthPayload {
@@ -25,19 +26,6 @@ const oauthRequest = async (payload: OAuthPayload) => {
     body: payload
   })
   return { status, data }
-}
-
-const createTestUser = async (email: string) => {
-  const { status } = await request('v1/auth/register', {
-    method: 'POST',
-    body: {
-      name: 'Test User',
-      email,
-      password: 'ValidPass123!'
-    }
-  })
-
-  return status === 201
 }
 
 const createOAuthLink = async (userId: string, provider: OAuthProvider, providerUserId: string) => {
@@ -137,7 +125,7 @@ describe('POST /api/v1/auth/oauth', () => {
       const providerUserId = 'google_existing_123'
 
       // Create user first
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       // Get user ID
@@ -171,7 +159,7 @@ describe('POST /api/v1/auth/oauth', () => {
       const email = 'existing.newprovider@oauth.forja.test'
 
       // Create user first
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       // Get user ID
@@ -219,7 +207,7 @@ describe('POST /api/v1/auth/oauth', () => {
       const email = 'multi.provider@oauth.forja.test'
 
       // Create user first
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       // Get user ID

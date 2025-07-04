@@ -1,6 +1,6 @@
 import { ofetch, type FetchOptions } from 'ofetch'
 import { useStorage } from './mocks/storage'
-import { afterAll, beforeAll } from 'vitest'
+import { beforeAll } from 'vitest'
 import retry from 'async-retry'
 
 beforeAll(async () => {
@@ -24,10 +24,6 @@ beforeAll(async () => {
   await waitForWebServer()
 })
 
-afterAll(async () => {
-  await removeMailcrabEmails()
-})
-
 export const request = async (url: string, options: FetchOptions = {}) => {
   options.ignoreResponseError = true
 
@@ -39,29 +35,6 @@ export const request = async (url: string, options: FetchOptions = {}) => {
     data: request._data,
     all: request
   }
-}
-
-// Email
-const mailcrabPort = process.env.MAILCRAB_PORT || '1080'
-const removeMailcrabEmails = async () => {
-  return
-  await fetch(`http://localhost:${mailcrabPort}/api/delete-all`, {
-    method: 'POST'
-  })
-}
-
-export const getTokenByResetPasswordFromEmail = async (id: string) => {
-  const response = await fetch(`http://localhost:${mailcrabPort}/api/message/${id}`)
-  const content = await response.json()
-
-  const element = new DOMParser().parseFromString(content.html, 'text/html')
-
-  if (!element.body) {
-    throw new Error('Email content not found')
-  }
-
-  const resetButton = element.body.querySelector('#reset-password-button') as HTMLAnchorElement
-  return resetButton.href.split('?token=')[1]
 }
 
 // Mock global useStorage for tests

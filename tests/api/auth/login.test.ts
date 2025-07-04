@@ -1,11 +1,9 @@
 import { afterAll, describe, expect, test } from 'vitest'
 import { request } from '#tests/setup'
-import { users } from '#server/database/schemas/users'
-import { useDB } from '#server/utils/database'
-import { like } from 'drizzle-orm'
+import userTest from '#tests/utils/user'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@forja.test'))
+  await userTest.deleteLikedEmails('%@forja.test')
 })
 interface LoginPayload {
   email?: string
@@ -20,19 +18,6 @@ const loginUser = async (payload: LoginPayload) => {
   return { status, data, headers }
 }
 
-const createTestUser = async (payload: LoginPayload) => {
-  const { status } = await request('v1/auth/register', {
-    method: 'POST',
-    body: {
-      name: 'Test User',
-      email: payload.email,
-      password: payload.password
-    }
-  })
-
-  return status === 201
-}
-
 describe('POST /api/v1/auth/login', () => {
   test('should login with valid credentials', async () => {
     const payload = {
@@ -40,7 +25,7 @@ describe('POST /api/v1/auth/login', () => {
       password: 'ValidPass123!'
     }
 
-    const userCreated = await createTestUser(payload)
+    const userCreated = await userTest.register(payload.email, payload.password)
     expect(userCreated).toBe(true)
 
     const { status, data, headers } = await loginUser(payload)
@@ -108,10 +93,7 @@ describe('POST /api/v1/auth/login', () => {
       const correctPassword = 'CorrectPass123!'
       const wrongPassword = 'WrongPass123!'
 
-      const userCreated = await createTestUser({
-        email,
-        password: correctPassword
-      })
+      const userCreated = await userTest.register(email, correctPassword)
       expect(userCreated).toBe(true)
 
       const payload = {
@@ -129,10 +111,7 @@ describe('POST /api/v1/auth/login', () => {
       const email = 'empty.password@forja.test'
       const password = 'ValidPass123!'
 
-      const userCreated = await createTestUser({
-        email,
-        password
-      })
+      const userCreated = await userTest.register(email, password)
       expect(userCreated).toBe(true)
 
       const payload = {

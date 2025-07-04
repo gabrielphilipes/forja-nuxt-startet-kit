@@ -1,13 +1,11 @@
 import { afterAll, describe, expect, test } from 'vitest'
-import { users } from '#server/database/schemas/users'
-import { useDB } from '#server/utils/database'
+import userTest from '#tests/utils/user'
 import { request } from '#tests/setup'
 import user from '#server/models/user'
-import { like } from 'drizzle-orm'
 import * as jose from 'jose'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@login-jwt.forja.test'))
+  await userTest.deleteLikedEmails('%@login-jwt.forja.test')
 })
 
 interface LoginJWTPayload {
@@ -23,19 +21,6 @@ const loginUserJWT = async (payload: LoginJWTPayload) => {
   return { status, data, headers }
 }
 
-const createTestUser = async (payload: LoginJWTPayload): Promise<boolean> => {
-  const { status } = await request('v1/auth/register', {
-    method: 'POST',
-    body: {
-      name: 'Test User',
-      email: payload.email,
-      password: payload.password
-    }
-  })
-
-  return status === 201
-}
-
 describe('POST /api/v1/auth/login-jwt', () => {
   test('should login with valid credentials and return JWT token', async () => {
     const payload = {
@@ -43,7 +28,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
       password: 'ValidPass123!'
     }
 
-    const userCreated = await createTestUser(payload)
+    const userCreated = await userTest.register(payload.email, payload.password)
     expect(userCreated).toBe(true)
 
     const { status, data } = await loginUserJWT(payload)
@@ -123,10 +108,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
       const correctPassword = 'CorrectPass123!'
       const wrongPassword = 'WrongPass123!'
 
-      const userCreated = await createTestUser({
-        email,
-        password: correctPassword
-      })
+      const userCreated = await userTest.register(email, correctPassword)
       expect(userCreated).toBe(true)
 
       const payload = {
@@ -145,10 +127,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
       const email = 'empty.password.jwt@login-jwt.forja.test'
       const password = 'ValidPass123!'
 
-      const userCreated = await createTestUser({
-        email,
-        password
-      })
+      const userCreated = await userTest.register(email, password)
       expect(userCreated).toBe(true)
 
       const payload = {
@@ -184,7 +163,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(payload)
+      const userCreated = await userTest.register(payload.email, payload.password)
       expect(userCreated).toBe(true)
 
       const { status, data } = await loginUserJWT(payload)
@@ -210,8 +189,8 @@ describe('POST /api/v1/auth/login-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      await createTestUser(user1)
-      await createTestUser(user2)
+      await userTest.register(user1.email, user1.password)
+      await userTest.register(user2.email, user2.password)
 
       const { data: data1 } = await loginUserJWT(user1)
       const { data: data2 } = await loginUserJWT(user2)
@@ -232,7 +211,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(payload)
+      const userCreated = await userTest.register(payload.email, payload.password)
       expect(userCreated).toBe(true)
 
       const { status, data } = await loginUserJWT(payload)
@@ -253,7 +232,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(payload)
+      const userCreated = await userTest.register(payload.email, payload.password)
       expect(userCreated).toBe(true)
 
       const { status, data } = await loginUserJWT(payload)
@@ -273,7 +252,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(payload)
+      const userCreated = await userTest.register(payload.email, payload.password)
       expect(userCreated).toBe(true)
 
       const { status, data } = await loginUserJWT(payload)

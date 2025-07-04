@@ -1,11 +1,12 @@
 import { afterAll, describe, expect, test } from 'vitest'
 import { users } from '#server/database/schemas/users'
 import { useDB } from '#server/utils/database'
-import { eq, like } from 'drizzle-orm'
+import userTest from '#tests/utils/user'
 import { request } from '#tests/setup'
+import { eq } from 'drizzle-orm'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@forja.test'))
+  await userTest.deleteLikedEmails('%@forja.test')
 })
 
 interface RegisterPayload {
