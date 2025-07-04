@@ -5,6 +5,7 @@ import RecoveryPassword from '@/emails/RecoveryPassword.vue'
 import { render } from '@vue-email/render'
 import { eq } from 'drizzle-orm'
 import * as jose from 'jose'
+import oauth from './oauth'
 
 interface UserLogin {
   id: string
@@ -160,11 +161,28 @@ const invalidateJWTToken = async (token: string): Promise<void> => {
   await useStorage().setItem('jwt-blacklist', blacklist)
 }
 
-const resetPassword = async (user: User): Promise<void> => {
+const forgotPassword = async (user: User, exp: number = 60 * 60 * 1): Promise<void> => {
+  // Check is oauth user
+  const userOAuth = await oauth.findByUserId(user.id)
+  if (userOAuth && userOAuth.length > 0 && !user.password) {
+    throw createError({
+      statusCode: 400,
+      message: 'Usuário não pode trocar a senha, pois é apenas OAuth'
+    })
+  }
+
+  /**
+   * If exp is undefined or null, set it to 1 hour by default
+   * Change the expiration time to valide in tests
+   */
+  if (exp === undefined || exp === null) {
+    exp = 60 * 60 * 1
+  }
+
   // Create token
   const tokenPayload = {
     email: user.email,
-    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 1 // 1 hour
+    exp: Math.floor(Date.now() / 1000 + exp) // 1 hour by default
   }
 
   const tokenToRecovery = encrypt(JSON.stringify(tokenPayload))
@@ -175,16 +193,59 @@ const resetPassword = async (user: User): Promise<void> => {
     recoveryUrl
   })
 
-  const emailResponse = await useEmail({
+  await useEmail({
     toEmail: user.email,
     toName: user.name,
     subject: `Recupere sua senha ${user.name}`,
     html: emailContent
   })
+}
 
-  console.log(emailResponse)
+const checkTokenToResetPassword = async (emailToCheck: string, token: string): Promise<string> => {
+  const tokenPayload = decrypt(token)
+  const tokenPayloadJson = JSON.parse(tokenPayload)
+  const { email, exp } = tokenPayloadJson
 
-  // Return success
+  const blacklist = ((await useStorage().getItem('reset-password-blacklist')) as string[]) || []
+
+  if (exp < Date.now() / 1000 || blacklist.includes(token)) {
+    throw createError({ statusCode: 401, message: 'Token expirado' })
+  }
+
+  if (email !== emailToCheck) {
+    throw createError({ statusCode: 401, message: 'E-mail informado não corresponde ao token' })
+  }
+
+  await invalidateTokenToResetPassword(token)
+
+  return email
+}
+
+const invalidateTokenToResetPassword = async (token: string): Promise<void> => {
+  const blacklist = ((await useStorage().getItem('reset-password-blacklist')) as string[]) || []
+  blacklist.push(token)
+  await useStorage().setItem('reset-password-blacklist', blacklist)
+}
+
+const changePassword = async (
+  user: User,
+  password: string,
+  password_confirmation: string
+): Promise<User> => {
+  if (password !== password_confirmation) {
+    throw createError({ statusCode: 400, message: 'As senhas não coincidem' })
+  }
+
+  await validateStrongPassword(password)
+
+  const hashedPassword = await createHashPassword(password)
+  const [updatedUser] = await useDB()
+    .update(users)
+    .set({ password: hashedPassword })
+    .where(eq(users.id, user.id))
+    .returning()
+
+  return updatedUser
 }
 
 export default {
@@ -196,5 +257,7 @@ export default {
   findByEmail,
   invalidateJWTToken,
   createUsingOAuth,
-  resetPassword
+  forgotPassword,
+  checkTokenToResetPassword,
+  changePassword
 }

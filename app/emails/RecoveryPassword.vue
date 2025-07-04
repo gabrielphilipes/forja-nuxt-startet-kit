@@ -14,7 +14,7 @@
     <Text
       :text="`Olá ${name}, recebemos uma solicitação para redefinir sua senha. Para criar uma nova senha, clique no botão abaixo:`"
     />
-    <Button text="Redefinir minha senha" :href="recoveryUrl" />
+    <Button id="reset-password-button" text="Redefinir minha senha" :href="recoveryUrl" />
     <Text text="Se você não solicitou a recuperação de senha, por favor ignore este email." />
   </Layout>
 </template>

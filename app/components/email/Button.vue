@@ -2,6 +2,7 @@
   defineProps<{
     text: string
     href: string
+    id?: string
   }>()
 </script>
 
@@ -19,6 +20,7 @@
       <tr style="width: 100%">
         <td>
           <a
+            :id="id"
             :href="href"
             style="
               line-height: 100%;

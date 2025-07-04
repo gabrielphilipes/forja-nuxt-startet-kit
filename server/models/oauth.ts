@@ -99,6 +99,18 @@ const findByUserIdAndProvider = async (
   }
 }
 
+const findByUserId = async (userId: string): Promise<UserOAuth[] | null> => {
+  try {
+    const userOAuth = await useDB().select().from(usersOAuth).where(eq(usersOAuth.user_id, userId))
+
+    return userOAuth
+  } catch (error) {
+    console.error(error)
+    throw createError({ statusCode: 500, message: 'Erro interno ao buscar usuário/OAuth' })
+  }
+}
+
 export default {
-  handler
+  handler,
+  findByUserId
 }

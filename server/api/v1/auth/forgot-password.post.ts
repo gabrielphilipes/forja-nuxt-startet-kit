@@ -6,6 +6,8 @@ export default defineEventHandler(async (event) => {
     ForgotPasswordSchema.safeParse(body)
   )
 
+  const expirationTime = getQuery(event)?.expiration_time as number | undefined
+
   if (!success) {
     throw createErrorValidation('Ajuste os dados enviados e tente novamente', error)
   }
@@ -23,5 +25,5 @@ export default defineEventHandler(async (event) => {
     return
   }
 
-  user.resetPassword(userToResetPassword)
+  await user.forgotPassword(userToResetPassword, expirationTime)
 })
