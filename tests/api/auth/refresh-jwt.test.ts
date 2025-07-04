@@ -1,13 +1,11 @@
 import { afterAll, describe, expect, test } from 'vitest'
-import { users } from '#server/database/schemas/users'
-import { useDB } from '#server/utils/database'
+import userTest from '#tests/utils/user'
 import { request } from '#tests/setup'
 import user from '#server/models/user'
-import { like } from 'drizzle-orm'
 import * as jose from 'jose'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@refresh-jwt.forja.test'))
+  await userTest.deleteLikedEmails('%@refresh-jwt.forja.test')
 })
 
 interface LoginJWTPayload {
@@ -55,7 +53,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
       password: 'ValidPass123!'
     }
 
-    const userCreated = await createTestUser(loginPayload)
+    const userCreated = await userTest.register(loginPayload.email, loginPayload.password)
     expect(userCreated).toBe(true)
 
     // Login to get the token
@@ -151,7 +149,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(loginPayload)
+      const userCreated = await userTest.register(loginPayload.email, loginPayload.password)
       expect(userCreated).toBe(true)
 
       const { data: loginData } = await loginUserJWT(loginPayload)
@@ -230,8 +228,8 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      await createTestUser(user1)
-      await createTestUser(user2)
+      await userTest.register(user1.email, user1.password)
+      await userTest.register(user2.email, user2.password)
 
       const { data: data1 } = await loginUserJWT(user1)
       const { data: data2 } = await loginUserJWT(user2)
@@ -255,7 +253,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(loginPayload)
+      const userCreated = await userTest.register(loginPayload.email, loginPayload.password)
       expect(userCreated).toBe(true)
 
       const { data: loginData } = await loginUserJWT(loginPayload)
@@ -282,7 +280,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(loginPayload)
+      const userCreated = await userTest.register(loginPayload.email, loginPayload.password)
       expect(userCreated).toBe(true)
 
       const { data: loginData } = await loginUserJWT(loginPayload)
@@ -308,7 +306,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(loginPayload)
+      const userCreated = await userTest.register(loginPayload.email, loginPayload.password)
       expect(userCreated).toBe(true)
 
       const { data: loginData } = await loginUserJWT(loginPayload)
@@ -335,7 +333,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(loginPayload)
+      const userCreated = await userTest.register(loginPayload.email, loginPayload.password)
       expect(userCreated).toBe(true)
 
       const { data: loginData } = await loginUserJWT(loginPayload)
@@ -378,7 +376,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(loginPayload)
+      const userCreated = await userTest.register(loginPayload.email, loginPayload.password)
       expect(userCreated).toBe(true)
 
       const { data: loginData } = await loginUserJWT(loginPayload)

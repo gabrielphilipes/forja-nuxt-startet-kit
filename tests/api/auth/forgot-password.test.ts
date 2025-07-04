@@ -3,12 +3,13 @@ import { afterAll, describe, expect, test } from 'vitest'
 import { users } from '#server/database/schemas/users'
 import { useDB } from '#server/utils/database'
 import mailcrab from '#tests/utils/mailcrab'
-import { like, eq } from 'drizzle-orm'
+import userTest from '#tests/utils/user'
 import { request } from '#tests/setup'
+import { eq } from 'drizzle-orm'
 
 afterAll(async () => {
-  await useDB().delete(users).where(like(users.email, '%@forgot-password.forja.test'))
-  await useDB().delete(users).where(like(users.email, '%@reset-password.forja.test'))
+  await userTest.deleteLikedEmails('%@forgot-password.forja.test')
+  await userTest.deleteLikedEmails('%@reset-password.forja.test')
 })
 
 interface ForgotPasswordPayload {
@@ -42,24 +43,11 @@ const resetPassword = async (payload: ResetPasswordPayload) => {
   return { status, data }
 }
 
-// Create a test user
-const createTestUser = async (email: string, password: string = 'ValidPass123!') => {
-  const { status } = await request('v1/auth/register', {
-    method: 'POST',
-    body: {
-      name: 'Test User',
-      email,
-      password
-    }
-  })
-  return status === 201
-}
-
 describe('POST /api/v1/auth/forgot-password', () => {
   describe('Solicitação de recuperação de senha', () => {
     test('should send password reset email for existing user', async () => {
       const email = 'existing.user@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       const { status } = await requestPasswordReset({ email })
@@ -89,7 +77,7 @@ describe('POST /api/v1/auth/forgot-password', () => {
 
     test('should handle multiple requests for same email', async () => {
       const email = 'multiple.requests@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       // First request
@@ -145,7 +133,7 @@ describe('POST /api/v1/auth/forgot-password', () => {
       const existingEmail = 'security.existing@forgot-password.forja.test'
       const nonExistingEmail = 'security.nonexistent@forgot-password.forja.test'
 
-      await createTestUser(existingEmail)
+      await userTest.register(existingEmail)
 
       const { status: existingStatus, data: existingData } = await requestPasswordReset({
         email: existingEmail
@@ -162,7 +150,7 @@ describe('POST /api/v1/auth/forgot-password', () => {
 
     test('should handle email with different case sensitivity', async () => {
       const email = 'CaseSensitive@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       // Test with different case variations
@@ -184,7 +172,7 @@ describe('POST /api/v1/auth/reset-password', () => {
   describe('Reset de senha com token válido', () => {
     test('should reset password with valid token', async () => {
       const email = 'valid.reset@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
@@ -217,7 +205,7 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password shorter than 8 characters', async () => {
       const email = 'short.password@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
@@ -240,7 +228,7 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password without uppercase letter', async () => {
       const email = 'no.uppercase.letter@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
@@ -263,7 +251,7 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password without lowercase letter', async () => {
       const email = 'no.lowercase.letter@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
@@ -286,7 +274,7 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password without number', async () => {
       const email = 'no.number@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
@@ -309,7 +297,7 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject password without special character', async () => {
       const email = 'no.special.character@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
@@ -370,7 +358,7 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject when password and confirmation do not match', async () => {
       const email = 'password.validation.mismatch@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
@@ -407,7 +395,7 @@ describe('POST /api/v1/auth/reset-password', () => {
 
     test('should reject expired token', async () => {
       const email = 'expired.token@reset-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email }, 1)
@@ -429,8 +417,8 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
 
     test('should reject already used token', async () => {
-      const email = 'used.token@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const email = 'used.token@reset-password.forja.test'
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })
@@ -500,8 +488,8 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
 
     test('should handle concurrent reset attempts', async () => {
-      const email = 'concurrent.reset@forgot-password.forja.test'
-      const userCreated = await createTestUser(email)
+      const email = 'concurrent.reset@reset-password.forja.test'
+      const userCreated = await userTest.register(email)
       expect(userCreated).toBe(true)
 
       await requestPasswordReset({ email })

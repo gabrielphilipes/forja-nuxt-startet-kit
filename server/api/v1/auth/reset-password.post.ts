@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
     if (!userToResetPassword) {
       throw createError({ statusCode: 404, message: 'Usuário não encontrado' })
     }
-  } catch {
-    throw createError({ statusCode: 401, message: 'Token inválido ou expirado' })
+  } catch (error) {
+    throw createError({ statusCode: 401, message: 'Token inválido ou expirado', cause: error })
   }
 
   // Validate and change password
