@@ -22,12 +22,6 @@ beforeAll(async () => {
   }
 
   await waitForWebServer()
-
-  const mailcrabPort = process.env.MAILCRAB_PORT || '1080'
-
-  await fetch(`http://localhost:${mailcrabPort}/api/delete-all`, {
-    method: 'POST'
-  })
 })
 
 export const request = async (url: string, options: FetchOptions = {}) => {

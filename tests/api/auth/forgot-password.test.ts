@@ -44,7 +44,7 @@ const resetPassword = async (payload: ResetPasswordPayload) => {
 }
 
 describe('POST /api/v1/auth/forgot-password', () => {
-  describe('Solicitação de recuperação de senha', () => {
+  describe('Password recovery request', () => {
     test('should send password reset email for existing user', async () => {
       const email = 'existing.user@forgot-password.forja.test'
       const userCreated = await userTest.register(email)
@@ -94,7 +94,7 @@ describe('POST /api/v1/auth/forgot-password', () => {
     })
   })
 
-  describe('Validação de dados', () => {
+  describe('Validation of data', () => {
     test('should reject request without email', async () => {
       const { status, data } = await requestPasswordReset({})
 
@@ -128,7 +128,7 @@ describe('POST /api/v1/auth/forgot-password', () => {
     })
   })
 
-  describe('Validação de segurança', () => {
+  describe('Security validation', () => {
     test('should not reveal if email exists in database', async () => {
       const existingEmail = 'security.existing@forgot-password.forja.test'
       const nonExistingEmail = 'security.nonexistent@forgot-password.forja.test'
@@ -169,7 +169,8 @@ describe('POST /api/v1/auth/forgot-password', () => {
 })
 
 describe('POST /api/v1/auth/reset-password', () => {
-  describe('Reset de senha com token válido', () => {
+  // describe('Reset de senha com token válido', () => {
+  describe('Reset password with valid token', () => {
     test('should reset password with valid token', async () => {
       const email = 'valid.reset@reset-password.forja.test'
       const userCreated = await userTest.register(email)
@@ -319,7 +320,7 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
   })
 
-  describe('Validação de dados do reset', () => {
+  describe('Validation of reset data', () => {
     test('should reject reset without token', async () => {
       const { status, data } = await resetPassword({
         email: 'reset.without.token@reset-password.forja.test',
@@ -380,7 +381,7 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
   })
 
-  describe('Validação de token', () => {
+  describe('Token validation', () => {
     test('should reject invalid token', async () => {
       const { status, data } = await resetPassword({
         email: 'invalid.token@reset-password.forja.test',
@@ -451,7 +452,7 @@ describe('POST /api/v1/auth/reset-password', () => {
     })
   })
 
-  describe('Validação de segurança do reset', () => {
+  describe('Security validation of reset', () => {
     test('should not allow reset for OAuth-only users', async () => {
       const email = 'oauth.only@reset-password.forja.test'
 

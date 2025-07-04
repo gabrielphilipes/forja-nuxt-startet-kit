@@ -13,9 +13,11 @@ const getEmails = async (email: string) => {
 
   const messages = await response.json()
 
-  return messages.filter((msg: { envelope_recipients: string[] }) =>
+  const filteredMessages = messages.filter((msg: { envelope_recipients: string[] }) =>
     msg.envelope_recipients.includes(email)
   )
+
+  return filteredMessages.reverse()
 }
 
 const getEmailById = async (emailId: string) => {
