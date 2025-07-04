@@ -1,9 +1,10 @@
+import { OAuthProvider, usersOAuth } from '#server/database/schemas/users_oauth'
 import { afterAll, describe, expect, test } from 'vitest'
 import { users } from '#server/database/schemas/users'
 import { useDB } from '#server/utils/database'
+import mailcrab from '#tests/utils/mailcrab'
 import { like, eq } from 'drizzle-orm'
-import { getTokenByResetPasswordFromEmail, request } from '#tests/setup'
-import { OAuthProvider, usersOAuth } from '#server/database/schemas/users_oauth'
+import { request } from '#tests/setup'
 
 afterAll(async () => {
   await useDB().delete(users).where(like(users.email, '%@forgot-password.forja.test'))
@@ -41,30 +42,6 @@ const resetPassword = async (payload: ResetPasswordPayload) => {
   return { status, data }
 }
 
-// Função para buscar e-mails no mailcrab
-const getMailcrabEmails = async (email: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  const mailcrabPort = process.env.MAILCRAB_PORT || '1080'
-  const response = await fetch(`http://localhost:${mailcrabPort}/api/messages`)
-
-  if (!response.ok) {
-    throw new Error('Falha ao buscar e-mails do mailcrab')
-  }
-
-  const messages = await response.json()
-
-  return messages.filter((msg: { envelope_recipients: string[] }) =>
-    msg.envelope_recipients.includes(email)
-  )
-}
-
-const getMailcrabEmailById = async (id: string) => {
-  const mailcrabPort = process.env.MAILCRAB_PORT || '1080'
-  const response = await fetch(`http://localhost:${mailcrabPort}/api/message/${id}`)
-  return response.json()
-}
-
 // Create a test user
 const createTestUser = async (email: string, password: string = 'ValidPass123!') => {
   const { status } = await request('v1/auth/register', {
@@ -89,13 +66,13 @@ describe('POST /api/v1/auth/forgot-password', () => {
 
       expect(status).toBe(204)
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
       const resetEmail = emails[0]
       expect(resetEmail.subject).toContain(`Recupere sua senha Test User`)
 
-      const emailContent = await getMailcrabEmailById(resetEmail.id)
+      const emailContent = await mailcrab.getEmailById(resetEmail.id)
       expect(emailContent.html).toContain(`/alterar-senha?token=`)
     })
 
@@ -106,7 +83,7 @@ describe('POST /api/v1/auth/forgot-password', () => {
 
       expect(status).toBe(204)
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBe(0)
     })
 
@@ -124,7 +101,7 @@ describe('POST /api/v1/auth/forgot-password', () => {
       expect(secondStatus).toBe(204)
 
       // Verify that both emails were sent
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThanOrEqual(2)
     })
   })
@@ -212,10 +189,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const newPassword = 'NewPassword123!'
       const { status } = await resetPassword({
@@ -245,10 +222,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -268,10 +245,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -291,10 +268,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -314,10 +291,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -337,10 +314,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -398,10 +375,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -435,10 +412,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email }, 1)
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       const { status, data } = await resetPassword({
         email,
@@ -458,10 +435,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       // First attempt (should work)
       const { status: firstStatus } = await resetPassword({
@@ -529,10 +506,10 @@ describe('POST /api/v1/auth/reset-password', () => {
 
       await requestPasswordReset({ email })
 
-      const emails = await getMailcrabEmails(email)
+      const emails = await mailcrab.getEmails(email)
       expect(emails.length).toBeGreaterThan(0)
 
-      const resetToken = await getTokenByResetPasswordFromEmail(emails[0].id)
+      const resetToken = await mailcrab.getTokenByResetPasswordFromEmail(emails[0].id)
 
       // Simulate concurrent attempts
       const promises = [
