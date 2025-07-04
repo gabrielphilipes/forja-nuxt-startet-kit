@@ -8,9 +8,9 @@ import * as jose from 'jose'
 import oauth from './oauth'
 
 interface UserLogin {
-  id: string
   name: string
   email: string
+  type?: 'access' | 'refresh'
   exp?: number
 }
 
@@ -120,26 +120,41 @@ const validateStrongPassword = async (password: string): Promise<void> => {
   }
 }
 
-const transformToLogin = (user: User | InsertUser): UserLogin => {
+const transformToLogin = (user: User | InsertUser, type?: 'access' | 'refresh'): UserLogin => {
   return {
-    id: user.id!,
     name: user.name,
-    email: user.email
+    email: user.email,
+    type
   }
 }
 
-const generateJWTToken = async (user: User): Promise<string> => {
-  const payload = transformToLogin(user)
+const generateJWTToken = async (user: User): Promise<{ token: string; exp: number }> => {
+  const payload = transformToLogin(user, 'access')
+
+  const exp = new Date(Date.now() + 60 * 60 * 15) // 15 minutes
 
   const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
     .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('1 week')
+    .setExpirationTime(exp)
     .sign(secret)
 
-  return token
+  return { token, exp: exp.getTime() }
 }
 
-const verifyJWTToken = async (token: string): Promise<UserLogin | null> => {
+const generateJWTTokenRefresh = async (user: User): Promise<{ token: string; exp: number }> => {
+  const payload = transformToLogin(user, 'refresh')
+
+  const exp = new Date(Date.now() + 60 * 60 * 24 * 7) // 7 days
+
+  const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime(exp)
+    .sign(secret)
+
+  return { token, exp: exp.getTime() }
+}
+
+const verifyJWTToken = async (token: string): Promise<UserLogin> => {
   const blacklist = ((await useStorage().getItem('jwt-blacklist')) as string[]) || []
 
   if (blacklist.includes(token)) {
@@ -151,7 +166,7 @@ const verifyJWTToken = async (token: string): Promise<UserLogin | null> => {
     return payload as unknown as UserLogin
   } catch (error) {
     console.error(error)
-    return null
+    throw createError({ statusCode: 401, message: 'Token expirado ou inválido', cause: error })
   }
 }
 
@@ -249,6 +264,7 @@ export default {
   loginWithPassword,
   transformToLogin,
   generateJWTToken,
+  generateJWTTokenRefresh,
   verifyJWTToken,
   findByEmail,
   invalidateJWTToken,

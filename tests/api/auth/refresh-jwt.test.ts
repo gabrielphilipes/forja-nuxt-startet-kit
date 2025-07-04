@@ -33,19 +33,6 @@ const refreshJWT = async (payload: RefreshJWTPayload) => {
   return { status, data, headers }
 }
 
-const createTestUser = async (payload: LoginJWTPayload): Promise<boolean> => {
-  const { status } = await request('v1/auth/register', {
-    method: 'POST',
-    body: {
-      name: 'Test User',
-      email: payload.email,
-      password: payload.password
-    }
-  })
-
-  return status === 201
-}
-
 describe('POST /api/v1/auth/refresh-jwt', () => {
   test('should refresh JWT token with valid token', async () => {
     const loginPayload = {
@@ -60,14 +47,14 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
     const { status: loginStatus, data: loginData } = await loginUserJWT(loginPayload)
     expect(loginStatus).toBe(200)
     expect(loginData.token).toBeDefined()
-
-    // Refresh the token
-    const refreshPayload = { token: loginData.token }
+    expect(loginData.token_exp).toBeDefined()
+    expect(loginData.token_refresh).toBeDefined()
+    expect(loginData.token_refresh_exp).toBeDefined()
 
     // Await 1 second to ensure the token is not identical to the original
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    const { status, data } = await refreshJWT(refreshPayload)
+    const { status, data } = await refreshJWT({ token: loginData.token_refresh })
 
     // Validate the response
     expect(status).toBe(200)
@@ -82,14 +69,12 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
     // Validate the new token
     const decodedToken = await user.verifyJWTToken(data.token)
     expect(decodedToken).not.toBeNull()
-    expect(decodedToken?.id).toBeDefined()
-    expect(decodedToken?.name).toBe('Test User')
-    expect(decodedToken?.email).toBe(loginPayload.email)
-    expect(decodedToken?.exp).toBeDefined()
+    expect(decodedToken.name).toBe('Test User')
+    expect(decodedToken.email).toBe(loginPayload.email)
+    expect(decodedToken.exp).toBeDefined()
 
     // Validate User Data
     expect(data.user).toBeDefined()
-    expect(data.user.id).toBeDefined()
     expect(data.user.name).toBe('Test User')
     expect(data.user.email).toBe(loginPayload.email)
     expect(data.user.password).toBeUndefined()
@@ -196,7 +181,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
         password: 'ValidPass123!'
       }
 
-      const userCreated = await createTestUser(loginPayload)
+      const userCreated = await userTest.register(loginPayload.email, loginPayload.password)
       expect(userCreated).toBe(true)
 
       const { data: loginData } = await loginUserJWT(loginPayload)
@@ -234,17 +219,16 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
       const { data: data1 } = await loginUserJWT(user1)
       const { data: data2 } = await loginUserJWT(user2)
 
-      const refresh1 = await refreshJWT({ token: data1.token })
-      const refresh2 = await refreshJWT({ token: data2.token })
+      const refresh1 = await refreshJWT({ token: data1.token_refresh })
+      const refresh2 = await refreshJWT({ token: data2.token_refresh })
 
       expect(refresh1.data.token).not.toBe(refresh2.data.token)
 
       const decoded1 = await user.verifyJWTToken(refresh1.data.token)
       const decoded2 = await user.verifyJWTToken(refresh2.data.token)
 
-      expect(decoded1?.id).not.toBe(decoded2?.id)
-      expect(decoded1?.email).toBe(user1.email)
-      expect(decoded2?.email).toBe(user2.email)
+      expect(decoded1.email).toBe(user1.email)
+      expect(decoded2.email).toBe(user2.email)
     })
 
     test('should return token with proper JWT structure', async () => {
