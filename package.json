@@ -45,10 +45,14 @@
     "check-updates": "bunx npm-check-updates -i --format group"
   },
   "dependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "@vue-email/components": "^0.0.21",
+    "@vue-email/render": "^0.0.9",
     "bcrypt": "6.0.0",
     "dotenv": "17.0.0",
     "drizzle-orm": "0.44.2",
     "nanoid": "5.1.5",
+    "nodemailer": "^7.0.4",
     "nuxt": "3.17.5",
     "nuxt-auth-utils": "0.5.20",
     "pg": "8.16.3",

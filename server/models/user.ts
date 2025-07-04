@@ -1,6 +1,8 @@
 import { users, type InsertUser, type User } from '#server/database/schemas/users'
 import { createErrorValidation } from '#server/utils/error'
 import { useDB } from '#server/utils/database'
+import RecoveryPassword from '@/emails/RecoveryPassword.vue'
+import { render } from '@vue-email/render'
 import { eq } from 'drizzle-orm'
 import * as jose from 'jose'
 
@@ -165,9 +167,23 @@ const resetPassword = async (user: User): Promise<void> => {
     exp: Math.floor(Date.now() / 1000) + 60 * 60 * 1 // 1 hour
   }
 
-  encrypt(JSON.stringify(tokenPayload))
+  const tokenToRecovery = encrypt(JSON.stringify(tokenPayload))
+  const recoveryUrl = `${process.env.SITE_URL}/alterar-senha?token=${tokenToRecovery}`
 
-  // TODO: Send email with token
+  const emailContent = await render(RecoveryPassword, {
+    name: user.name,
+    recoveryUrl
+  })
+
+  const emailResponse = await useEmail({
+    toEmail: user.email,
+    toName: user.name,
+    subject: `Recupere sua senha ${user.name}`,
+    html: emailContent
+  })
+
+  console.log(emailResponse)
+
   // Return success
 }
 

@@ -15,12 +15,13 @@ export default defineEventHandler(async (event) => {
   const userToResetPassword = await user.findByEmail(email)
 
   if (!userToResetPassword) {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setResponseStatus(event, 200)
+    /**
+     * Simulates sending a password recovery email, for security reasons, thus preventing
+     * the request speed from being used to discover whether the email exists or not.
+     */
+    await new Promise((resolve) => setTimeout(resolve, 500))
     return
   }
 
   user.resetPassword(userToResetPassword)
-
-  setResponseStatus(event, 200)
 })
