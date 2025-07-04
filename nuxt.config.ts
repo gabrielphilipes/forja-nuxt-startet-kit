@@ -1,3 +1,4 @@
+import vue from '@vitejs/plugin-vue'
 import { resolve } from 'node:path'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -8,7 +9,11 @@ export default defineNuxtConfig({
   srcDir: 'app',
   serverDir: 'server',
   nitro: {
-    preset: 'vercel'
+    preset: 'vercel',
+
+    rollupConfig: {
+      plugins: [vue()]
+    }
   },
 
   modules: ['@nuxt/eslint', '@nuxt/test-utils/module', 'nuxt-auth-utils'],
