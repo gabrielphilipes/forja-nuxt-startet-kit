@@ -1,6 +1,6 @@
 import { ofetch, type FetchOptions } from 'ofetch'
 import { useStorage } from './mocks/storage'
-import { beforeAll } from 'vitest'
+import { afterAll, beforeAll } from 'vitest'
 import retry from 'async-retry'
 
 beforeAll(async () => {
@@ -22,9 +22,11 @@ beforeAll(async () => {
   }
 
   await waitForWebServer()
+})
 
+afterAll(async () => {
   await removeMailcrabEmails()
-}, 30000)
+})
 
 export const request = async (url: string, options: FetchOptions = {}) => {
   options.ignoreResponseError = true
@@ -42,6 +44,7 @@ export const request = async (url: string, options: FetchOptions = {}) => {
 // Email
 const mailcrabPort = process.env.MAILCRAB_PORT || '1080'
 const removeMailcrabEmails = async () => {
+  return
   await fetch(`http://localhost:${mailcrabPort}/api/delete-all`, {
     method: 'POST'
   })

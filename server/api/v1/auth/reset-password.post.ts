@@ -11,12 +11,12 @@ export default defineEventHandler(async (event) => {
     throw createErrorValidation('Ajuste os dados enviados e tente novamente', error)
   }
 
-  const { email, token, password, password_confirmation } = data
+  const { token, password, password_confirmation } = data
 
   let userToResetPassword: User | null = null
   try {
     // Validate token
-    const emailToResetPassword = await user.checkTokenToResetPassword(email, token)
+    const emailToResetPassword = await user.checkTokenToResetPassword(token)
 
     // Check if user exists
     userToResetPassword = await user.findByEmail(emailToResetPassword)

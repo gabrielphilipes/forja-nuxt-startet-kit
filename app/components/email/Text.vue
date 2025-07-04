@@ -4,6 +4,7 @@
   }>()
 </script>
 
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <p
     style="

@@ -201,7 +201,7 @@ const forgotPassword = async (user: User, exp: number = 60 * 60 * 1): Promise<vo
   })
 }
 
-const checkTokenToResetPassword = async (emailToCheck: string, token: string): Promise<string> => {
+const checkTokenToResetPassword = async (token: string): Promise<string> => {
   const tokenPayload = decrypt(token)
   const tokenPayloadJson = JSON.parse(tokenPayload)
   const { email, exp } = tokenPayloadJson
@@ -210,10 +210,6 @@ const checkTokenToResetPassword = async (emailToCheck: string, token: string): P
 
   if (exp < Date.now() / 1000 || blacklist.includes(token)) {
     throw createError({ statusCode: 401, message: 'Token expirado' })
-  }
-
-  if (email !== emailToCheck) {
-    throw createError({ statusCode: 401, message: 'E-mail informado não corresponde ao token' })
   }
 
   await invalidateTokenToResetPassword(token)
