@@ -1,6 +1,6 @@
+import { createValidSession, request } from '#tests/setup'
 import { afterAll, describe, expect, test } from 'vitest'
 import userTest from '#tests/utils/user'
-import { request } from '#tests/setup'
 
 afterAll(async () => {
   await userTest.deleteLikedEmails('%@me.forja.test')
@@ -8,7 +8,6 @@ afterAll(async () => {
 
 const getMe = async (headers?: Record<string, string>) => {
   const { status, data } = await request('v1/auth/me', {
-    method: 'GET',
     headers
   })
   return { status, data }
@@ -30,33 +29,6 @@ const createValidToken = async (email: string) => {
 
   expect(status).toBe(200)
   return data.token
-}
-
-const createValidSession = async (email: string) => {
-  const payload = {
-    email,
-    password: 'ValidPass123!'
-  }
-
-  const userCreated = await userTest.register(payload.email, payload.password)
-  expect(userCreated).toBe(true)
-
-  const { status, headers } = await request('v1/auth/login', {
-    method: 'POST',
-    body: payload
-  })
-
-  expect(status).toBe(204)
-
-  const sessionCookie = headers.get('Set-Cookie')
-  expect(sessionCookie).toBeDefined()
-  expect(sessionCookie).toContain('nuxt-session')
-
-  if (!sessionCookie) {
-    throw new Error('Session cookie not found')
-  }
-
-  return sessionCookie
 }
 
 describe('GET /api/v1/auth/me', () => {
