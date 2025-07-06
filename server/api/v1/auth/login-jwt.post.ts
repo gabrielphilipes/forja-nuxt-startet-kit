@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
   const token = await user.generateJWTToken(loginUser)
 
-  const refreshToken = await user.generateJWTToken(loginUser)
+  const refreshToken = await user.generateJWTTokenRefresh(loginUser)
 
   const loginUserData = user.transformToLogin(loginUser)
 

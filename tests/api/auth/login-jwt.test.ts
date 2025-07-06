@@ -175,14 +175,18 @@ describe('POST /api/v1/auth/login-jwt', () => {
       const decodedToken = await user.verifyJWTToken(data.token)
       expect(decodedToken).not.toBeNull()
 
-      const expectedExp = Math.floor(Date.now() / 1000) + 60 * 15 // 15 minutes in seconds
-      expect(decodedToken.exp).toBeLessThan(expectedExp)
+      const tokenExp = new Date(decodedToken.exp * 1000)
+      const expectedExp = new Date(Date.now() + 60 * 15 * 1000)
+      expectedExp.setMilliseconds(0)
+      expect(tokenExp).toEqual(expectedExp)
 
       const decodedRefreshToken = await user.verifyJWTToken(data.token_refresh)
       expect(decodedRefreshToken).not.toBeNull()
 
-      const expectedRefreshExp = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days in seconds
-      expect(decodedRefreshToken.exp).toBeLessThan(expectedRefreshExp)
+      const tokenExpRefresh = new Date(decodedRefreshToken.exp * 1000)
+      const expectedExpRefresh = new Date(Date.now() + 60 * 60 * 24 * 7 * 1000)
+      expectedExpRefresh.setMilliseconds(0)
+      expect(tokenExpRefresh).toEqual(expectedExpRefresh)
     })
 
     test('should return different tokens for different users', async () => {

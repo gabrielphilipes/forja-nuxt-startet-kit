@@ -131,7 +131,7 @@ const transformToLogin = (user: User | InsertUser, type?: 'access' | 'refresh'):
 const generateJWTToken = async (user: User): Promise<{ token: string; exp: number }> => {
   const payload = transformToLogin(user, 'access')
 
-  const exp = new Date(Date.now() + 60 * 60 * 15) // 15 minutes
+  const exp = new Date(Date.now() + 60 * 15 * 1000) // 15 minutes
 
   const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
     .setProtectedHeader({ alg: 'HS256' })
@@ -144,7 +144,7 @@ const generateJWTToken = async (user: User): Promise<{ token: string; exp: numbe
 const generateJWTTokenRefresh = async (user: User): Promise<{ token: string; exp: number }> => {
   const payload = transformToLogin(user, 'refresh')
 
-  const exp = new Date(Date.now() + 60 * 60 * 24 * 7) // 7 days
+  const exp = new Date(Date.now() + 60 * 60 * 24 * 7 * 1000) // 7 days
 
   const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
     .setProtectedHeader({ alg: 'HS256' })
