@@ -33,11 +33,10 @@ describe('POST /api/v1/auth/login', () => {
     expect(status).toBe(204)
     expect(data).toBeUndefined()
 
-    const sessionName = (process.env.SITE_NAME ?? 'forja')?.toLowerCase().replace(/\s+/g, '-')
     const sessionCookie = headers.get('Set-Cookie')
 
     expect(sessionCookie).toBeDefined()
-    expect(sessionCookie).toContain(`${sessionName}-session`)
+    expect(sessionCookie).toContain(`nuxt-session`)
     expect(sessionCookie).toContain('HttpOnly;')
     expect(sessionCookie).toContain('Secure;')
   })
