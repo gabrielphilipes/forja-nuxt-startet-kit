@@ -1,75 +1,88 @@
-# Nuxt Minimal Starter
+# Forja
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Kit inicial para acelerar o desenvolvimento de aplicações SaaS com Nuxt.js. Pronto para produção, contendo autenticação TOTP, gestão de perfil, administração, assinaturas e muito mais.
 
-## Setup
+Desenvolvido por [Gabriel Philipe](https://philipe.dev), desenvolvedor full stack com ampla experiência em PHP que decidiu mergulhar no universo do JavaScript/TypeScript.
 
-Make sure to install dependencies:
+## Recursos incluídos
+
+- Cadastro com usuário e senha
+- Cadastro via OAuth (Google, Facebook e GitHub)
+- Confirmação de conta, via e-mail
+- Login (incluindo rate limit e TOTP)
+- Login via JWT
+- Recuperação de senha
+- Dashboard de acesso
+- Edição de perfil
+- Troca de senha
+- Exclusão de conta
+
+## Início rápido
+
+Para começar a desenvolver com o `Forja`, siga as instruções abaixo.
 
 ```bash
-# npm
-npm install
+# Clone o repositório
+git clone https://github.com/gabrielphilipes/forja-nuxt-startet-kit
+cd forja
 
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
+# Instale as dependências
 bun install
-```
 
-## Development Server
+# Copie as configurações iniciais de exemplo
+cp .env.example .env
 
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
+# Inicie o ambiente de desenvolvimento
 bun run dev
 ```
 
-## Production
+O comando `bun run dev` irá automaticamente:
 
-Build the application for production:
+- Subir os serviços Docker necessários (banco de dados)
+- Aguardar a conexão com o banco
+- Executar as migrações do banco de dados
+- Iniciar o servidor de desenvolvimento Nuxt
 
-```bash
-# npm
-npm run build
+Para parar o ambiente, use `Ctrl+C` e os serviços serão encerrados automaticamente.
 
-# pnpm
-pnpm build
+Fique a vontade para executar os testes (`bun run test`) para garantir que tudo está funcionando :-D
 
-# yarn
-yarn build
+## Boas práticas
 
-# bun
-bun run build
-```
+Para garantir boas práticas do projeto, implementamos as seguintes ferramentas e processos:
 
-Locally preview production build:
+### 📝 Qualidade de Código
 
-```bash
-# npm
-npm run preview
+- **ESLint**: Análise estática de código JavaScript/TypeScript
+- **Prettier**: Formatação automática, garantindo estética padrão no projeto
+- **Secretlint**: Verificação automática de credenciais expostas no código
+- **Husky**: Execução de hooks para validação geral de: qualidade, estética, segurança e outros...
 
-# pnpm
-pnpm preview
+### 🧪 Testes
 
-# yarn
-yarn preview
+- **Vitest**: Framework de testes unitários e de integração
+- **CI/CD**: Execução automática de testes em Pull Requests
 
-# bun
-bun run preview
-```
+### 📋 Padrões de Commit
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- **Commitlint**: Validação de mensagens de commit seguindo Conventional Commits
+- **Commitizen**: Interface interativa para criação de commits padronizados (`bun run commit`)
+- **Template de PR**: Estrutura padronizada para Pull Requests
+- **Templates de Issue**: Formulários estruturados para bugs e features
+
+### 🔄 Workflow
+
+- **GitHub Actions**: Automação de CI/CD para validação do código via pull request e garantia de qualidade
+- **Pre-commit**: Validação automática local antes de commits
+- **Pull Request**: Revisão obrigatória de código
+- **Docker Compose**: Gerenciamento automatizado de serviços de infraestrutura (`bun run services:up/down`)
+- **Migrations**: Sistema de migrações de banco de dados automatizado (`bun run migrations:generate/migrate`)
+
+### 🛠️ Scripts Disponíveis
+
+- **`bun run dev`**: Inicializa ambiente completo (serviços + banco + migrações)
+- **`bun run test`**: Executa testes com ambiente completo
+- **`bun run test:watch`**: Modo watch para desenvolvimento
+- **`bun run lint:eslint:fix`**: Correção automática de problemas de linting
+- **`bun run lint:prettier:fix`**: Formatação automática de código
+- **`bun run check-updates`**: Verificação e atualização de dependências
