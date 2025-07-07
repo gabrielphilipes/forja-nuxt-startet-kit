@@ -1,5 +1,6 @@
 import { RefreshJWTSchema } from '#server/utils/validations/auth'
 import user from '#server/models/user'
+import { useAuth } from '~~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
   const { success, data, error } = await readValidatedBody(event, (body) =>
@@ -12,7 +13,7 @@ export default defineEventHandler(async (event) => {
 
   // Check if the token is valid
   const refreshToken = data.token
-  const decodedRefreshToken = await user.verifyJWTToken(refreshToken)
+  const decodedRefreshToken = await useAuth().verifyJWTToken(refreshToken)
 
   if (!decodedRefreshToken) {
     throw createError({ statusCode: 401, message: 'Token expirado ou inválido' })
@@ -25,12 +26,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Usuário não encontrado' })
   }
 
-  const newToken = await user.generateJWTToken(currentUser)
-  const newRefreshToken = await user.generateJWTTokenRefresh(currentUser)
+  const newToken = await useAuth().generateJWTToken(currentUser)
+  const newRefreshToken = await useAuth().generateJWTTokenRefresh(currentUser)
 
   const userData = user.transformToLogin(currentUser)
 
-  await user.invalidateJWTToken(refreshToken)
+  await useAuth().invalidateJWTToken(refreshToken)
 
   return {
     token: newToken.token,

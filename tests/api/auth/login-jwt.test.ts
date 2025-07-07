@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, test } from 'vitest'
+import { useAuth } from '#server/utils/auth'
 import userTest from '#tests/utils/user'
 import { request } from '#tests/setup'
-import user from '#server/models/user'
 import * as jose from 'jose'
 
 afterAll(async () => {
@@ -43,7 +43,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
     expect(data.token_refresh).toBeDefined()
     expect(data.token_refresh_exp).toBeDefined()
 
-    const decodedToken = await user.verifyJWTToken(data.token)
+    const decodedToken = await useAuth().verifyJWTToken(data.token)
     expect(decodedToken).not.toBeNull()
     expect(decodedToken.name).toBe('Test User')
     expect(decodedToken.email).toBe(payload.email)
@@ -172,7 +172,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
       expect(status).toBe(200)
       expect(data.token).toBeDefined()
 
-      const decodedToken = await user.verifyJWTToken(data.token)
+      const decodedToken = await useAuth().verifyJWTToken(data.token)
       expect(decodedToken).not.toBeNull()
 
       const tokenExp = new Date(decodedToken.exp * 1000)
@@ -180,7 +180,7 @@ describe('POST /api/v1/auth/login-jwt', () => {
       expectedExp.setMilliseconds(0)
       expect(tokenExp).toEqual(expectedExp)
 
-      const decodedRefreshToken = await user.verifyJWTToken(data.token_refresh)
+      const decodedRefreshToken = await useAuth().verifyJWTToken(data.token_refresh)
       expect(decodedRefreshToken).not.toBeNull()
 
       const tokenExpRefresh = new Date(decodedRefreshToken.exp * 1000)
@@ -208,8 +208,8 @@ describe('POST /api/v1/auth/login-jwt', () => {
 
       expect(data1.token).not.toBe(data2.token)
 
-      const decoded1 = await user.verifyJWTToken(data1.token)
-      const decoded2 = await user.verifyJWTToken(data2.token)
+      const decoded1 = await useAuth().verifyJWTToken(data1.token)
+      const decoded2 = await useAuth().verifyJWTToken(data2.token)
 
       expect(decoded1?.email).toBe(user1.email)
       expect(decoded2?.email).toBe(user2.email)

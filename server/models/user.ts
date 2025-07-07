@@ -4,17 +4,14 @@ import { useDB } from '#server/utils/database'
 import RecoveryPassword from '@/emails/RecoveryPassword.vue'
 import { render } from '@vue-email/render'
 import { eq } from 'drizzle-orm'
-import * as jose from 'jose'
 import oauth from './oauth'
 
-interface UserLogin {
+export interface UserLogin {
   name: string
   email: string
   type?: 'access' | 'refresh'
   exp?: number
 }
-
-const secret = Buffer.from(process.env.NUXT_SESSION_PASSWORD!, 'utf-8')
 
 const createUsingPassword = async (user: InsertUser): Promise<User | null> => {
   await valideUniqueEmail(user.email)
@@ -128,54 +125,6 @@ const transformToLogin = (user: User | InsertUser, type?: 'access' | 'refresh'):
   }
 }
 
-const generateJWTToken = async (user: User): Promise<{ token: string; exp: number }> => {
-  const payload = transformToLogin(user, 'access')
-
-  const exp = new Date(Date.now() + 60 * 15 * 1000) // 15 minutes
-
-  const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime(exp)
-    .sign(secret)
-
-  return { token, exp: exp.getTime() }
-}
-
-const generateJWTTokenRefresh = async (user: User): Promise<{ token: string; exp: number }> => {
-  const payload = transformToLogin(user, 'refresh')
-
-  const exp = new Date(Date.now() + 60 * 60 * 24 * 7 * 1000) // 7 days
-
-  const token = await new jose.SignJWT(payload as unknown as jose.JWTPayload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime(exp)
-    .sign(secret)
-
-  return { token, exp: exp.getTime() }
-}
-
-const verifyJWTToken = async (token: string): Promise<UserLogin> => {
-  const blacklist = ((await useStorage().getItem('jwt-blacklist')) as string[]) || []
-
-  if (blacklist.includes(token)) {
-    throw createError({ statusCode: 401, message: 'Token expirado ou inválido' })
-  }
-
-  try {
-    const { payload } = await jose.jwtVerify(token, secret)
-    return payload as unknown as UserLogin
-  } catch (error) {
-    console.error(error)
-    throw createError({ statusCode: 401, message: 'Token expirado ou inválido', cause: error })
-  }
-}
-
-const invalidateJWTToken = async (token: string): Promise<void> => {
-  const blacklist = ((await useStorage().getItem('jwt-blacklist')) as string[]) || []
-  blacklist.push(token)
-  await useStorage().setItem('jwt-blacklist', blacklist)
-}
-
 const forgotPassword = async (user: User, exp: number = 60 * 60 * 1): Promise<void> => {
   // Check is oauth user
   const userOAuth = await oauth.findByUserId(user.id)
@@ -227,15 +176,10 @@ const checkTokenToResetPassword = async (token: string): Promise<string> => {
     throw createError({ statusCode: 401, message: 'Token expirado' })
   }
 
-  await invalidateTokenToResetPassword(token)
+  // Add token to blacklist
+  await useStorage().setItem('reset-password-blacklist', [...blacklist, token])
 
   return email
-}
-
-const invalidateTokenToResetPassword = async (token: string): Promise<void> => {
-  const blacklist = ((await useStorage().getItem('reset-password-blacklist')) as string[]) || []
-  blacklist.push(token)
-  await useStorage().setItem('reset-password-blacklist', blacklist)
 }
 
 const changePassword = async (
@@ -263,11 +207,7 @@ export default {
   createUsingPassword,
   loginWithPassword,
   transformToLogin,
-  generateJWTToken,
-  generateJWTTokenRefresh,
-  verifyJWTToken,
   findByEmail,
-  invalidateJWTToken,
   createUsingOAuth,
   forgotPassword,
   checkTokenToResetPassword,
