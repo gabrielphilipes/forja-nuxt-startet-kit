@@ -1,7 +1,8 @@
 import { ofetch, type FetchOptions } from 'ofetch'
 import { useStorage } from './mocks/storage'
-import { beforeAll } from 'vitest'
+import { beforeAll, expect } from 'vitest'
 import retry from 'async-retry'
+import userTest from '#tests/utils/user'
 
 beforeAll(async () => {
   // Wait for the web server to start
@@ -35,6 +36,33 @@ export const request = async (url: string, options: FetchOptions = {}) => {
     data: request._data,
     all: request
   }
+}
+
+export const createValidSession = async (email: string) => {
+  const payload = {
+    email,
+    password: 'ValidPass123!'
+  }
+
+  const userCreated = await userTest.register(payload.email, payload.password)
+  expect(userCreated).toBe(true)
+
+  const { status, headers } = await request('v1/auth/login', {
+    method: 'POST',
+    body: payload
+  })
+
+  expect(status).toBe(204)
+
+  const sessionCookie = headers.get('Set-Cookie')
+  expect(sessionCookie).toBeDefined()
+  expect(sessionCookie).toContain('nuxt-session')
+
+  if (!sessionCookie) {
+    throw new Error('Session cookie not found')
+  }
+
+  return sessionCookie
 }
 
 // Mock global useStorage for tests

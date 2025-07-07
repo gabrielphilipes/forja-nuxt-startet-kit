@@ -24,9 +24,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Credenciais inválidas' })
   }
 
-  const token = await user.generateJWTToken(loginUser)
+  const token = await useAuth().generateJWTToken(loginUser)
 
-  const refreshToken = await user.generateJWTToken(loginUser)
+  const refreshToken = await useAuth().generateJWTTokenRefresh(loginUser)
 
   const loginUserData = user.transformToLogin(loginUser)
 

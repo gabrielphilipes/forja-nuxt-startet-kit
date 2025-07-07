@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, test } from 'vitest'
+import { useAuth } from '#server/utils/auth'
 import userTest from '#tests/utils/user'
 import { request } from '#tests/setup'
-import user from '#server/models/user'
 import * as jose from 'jose'
 
 afterAll(async () => {
@@ -67,7 +67,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
     expect(data.token).not.toBe(loginData.token)
 
     // Validate the new token
-    const decodedToken = await user.verifyJWTToken(data.token)
+    const decodedToken = await useAuth().verifyJWTToken(data.token)
     expect(decodedToken).not.toBeNull()
     expect(decodedToken.name).toBe('Test User')
     expect(decodedToken.email).toBe(loginPayload.email)
@@ -195,7 +195,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
       expect(status).toBe(200)
       expect(data.token).toBeDefined()
 
-      const decodedToken = await user.verifyJWTToken(data.token)
+      const decodedToken = await useAuth().verifyJWTToken(data.token)
       expect(decodedToken).not.toBeNull()
 
       const currentTime = Math.floor(Date.now() / 1000)
@@ -224,8 +224,8 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
 
       expect(refresh1.data.token).not.toBe(refresh2.data.token)
 
-      const decoded1 = await user.verifyJWTToken(refresh1.data.token)
-      const decoded2 = await user.verifyJWTToken(refresh2.data.token)
+      const decoded1 = await useAuth().verifyJWTToken(refresh1.data.token)
+      const decoded2 = await useAuth().verifyJWTToken(refresh2.data.token)
 
       expect(decoded1.email).toBe(user1.email)
       expect(decoded2.email).toBe(user2.email)
@@ -324,7 +324,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
       const originalToken = loginData.token
 
       // Verificar que o token original é válido
-      const originalDecoded = await user.verifyJWTToken(originalToken)
+      const originalDecoded = await useAuth().verifyJWTToken(originalToken)
       expect(originalDecoded).not.toBeNull()
       expect(originalDecoded?.email).toBe(loginPayload.email)
 
@@ -341,7 +341,7 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
       expect(data.token).not.toBe(originalToken)
 
       // Verificar que o novo token é válido
-      const newDecoded = await user.verifyJWTToken(data.token)
+      const newDecoded = await useAuth().verifyJWTToken(data.token)
       expect(newDecoded).not.toBeNull()
       expect(newDecoded?.email).toBe(loginPayload.email)
 
@@ -376,8 +376,8 @@ describe('POST /api/v1/auth/refresh-jwt', () => {
       expect(refreshData.user.name).toBe(loginData.user.name)
       expect(refreshData.user.email).toBe(loginData.user.email)
 
-      const decodedOriginal = await user.verifyJWTToken(loginData.token)
-      const decodedRefresh = await user.verifyJWTToken(refreshData.token)
+      const decodedOriginal = await useAuth().verifyJWTToken(loginData.token)
+      const decodedRefresh = await useAuth().verifyJWTToken(refreshData.token)
 
       expect(decodedOriginal?.id).toBe(decodedRefresh?.id)
       expect(decodedOriginal?.name).toBe(decodedRefresh?.name)
