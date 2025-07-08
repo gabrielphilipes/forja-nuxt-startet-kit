@@ -2,7 +2,14 @@
 @import '@nuxt/ui';
 
 @layer base {
+  a,
+  input,
+  textarea,
+  button {
+    @apply !transition-all !duration-150 !ease-in-out;
+  }
+
   a {
-    @apply transition-colors duration-150;
+    @apply underline hover:text-primary;
   }
 }

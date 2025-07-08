@@ -6,7 +6,7 @@
       <LayoutHeader />
     </div>
 
-    <main class="w-10/12 max-w-lg mx-auto mt-28">
+    <main class="w-10/12 max-w-sm mx-auto mt-28">
       <div class="md:hidden -ml-4">
         <LayoutHeader />
       </div>
@@ -15,24 +15,16 @@
     </main>
 
     <ul
-      class="flex items-center justify-center gap-4 mt-10 text-sm text-gray-400 dark:text-gray-500"
+      class="flex items-center justify-center gap-4 mt-10 text-xs text-neutral-400 dark:text-neutral-500 mb-32 md:mb-0"
     >
       <li>
-        <NuxtLink
-          to="/termos-de-uso"
-          class="underline hover:text-gray-700 dark:hover:text-gray-400"
-        >
-          Termos de Uso
-        </NuxtLink>
+        <NuxtLink to="/termos-de-uso">Termos de Uso</NuxtLink>
       </li>
 
+      <span class="text-xs text-neutral-400 dark:text-neutral-500">|</span>
+
       <li>
-        <NuxtLink
-          to="/política-de-privacidade"
-          class="underline hover:text-gray-700 dark:hover:text-gray-400"
-        >
-          Política de Privacidade
-        </NuxtLink>
+        <NuxtLink to="/política-de-privacidade">Política de Privacidade </NuxtLink>
       </li>
     </ul>
   </div>
