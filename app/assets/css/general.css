@@ -1,2 +1,8 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
+
+@layer base {
+  a {
+    @apply transition-colors duration-150;
+  }
+}
