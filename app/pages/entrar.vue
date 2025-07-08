@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import { LoginUserSchema } from '#shared/validations/auth'
+
   definePageMeta({ layout: 'auth' })
 
   // Form
@@ -11,9 +13,7 @@
   const submitIsLoading = ref(false)
   const toast = useToast()
 
-  const handleSubmit = (e: Event) => {
-    console.log(e)
-
+  const handleSubmit = () => {
     passwordVisible.value = false
     submitIsLoading.value = true
 
@@ -51,14 +51,20 @@
       <h1 class="text-3xl">Que bom te ver novamente!</h1>
     </header>
 
-    <UForm :state="state" class="flex flex-col gap-4" @submit="handleSubmit">
+    <UForm
+      :state="state"
+      :schema="LoginUserSchema"
+      class="flex flex-col gap-4"
+      @submit="handleSubmit"
+    >
       <UFormField name="email" label="E-mail">
         <UInput
           v-model="state.email"
           type="email"
-          :placeholder="`gabriel@${useAppConfig().site_name.toLowerCase()}.com`"
+          :placeholder="`philipe_gabriel@${useAppConfig().site_name.toLowerCase()}.com`"
           class="block"
           :disabled="submitIsLoading"
+          autofocus
         />
       </UFormField>
 

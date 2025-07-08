@@ -1,4 +1,4 @@
-import { LoginUserSchema } from '#server/utils/validations/auth'
+import { LoginUserSchema } from '#shared/validations/auth'
 import type { User } from '#server/database/schemas/users'
 import user from '#server/models/user'
 

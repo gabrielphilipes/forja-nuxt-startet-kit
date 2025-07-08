@@ -6,7 +6,7 @@
       <LayoutHeader />
     </div>
 
-    <main class="w-10/12 max-w-sm mx-auto mt-28">
+    <main class="w-10/12 max-w-sm mx-auto mt-12 md:mt-28">
       <div class="md:hidden -ml-4">
         <LayoutHeader />
       </div>
