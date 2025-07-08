@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'node:path'
 
@@ -16,7 +17,13 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxt/eslint', '@nuxt/test-utils/module', 'nuxt-auth-utils'],
+  modules: ['@nuxt/eslint', '@nuxt/test-utils/module', 'nuxt-auth-utils', '@nuxt/ui'],
+
+  css: ['~/assets/css/general.css'],
+
+  vite: {
+    plugins: [tailwindcss()]
+  },
 
   alias: {
     '#tests': resolve(__dirname, 'tests'),
