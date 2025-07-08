@@ -6,7 +6,7 @@
 
 <template>
   <UButton variant="outline" color="neutral" class="w-full" :disabled="disabledButtons">
-    <Icon name="logos:github-icon" />
+    <Icon name="logos:github-icon" class="dark:invert" />
     Continuar com o GitHub
   </UButton>
 
@@ -21,7 +21,7 @@
   </UButton>
 
   <UButton variant="outline" color="neutral" class="w-full" :disabled="disabledButtons">
-    <Icon name="devicon:apple" />
+    <Icon name="devicon:apple" class="dark:invert" />
     Continuar com a Apple
   </UButton>
 </template>

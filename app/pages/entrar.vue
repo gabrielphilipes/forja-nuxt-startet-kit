@@ -9,6 +9,7 @@
 
   const passwordVisible = ref(false)
   const submitIsLoading = ref(false)
+  const toast = useToast()
 
   const handleSubmit = (e: Event) => {
     console.log(e)
@@ -16,9 +17,25 @@
     passwordVisible.value = false
     submitIsLoading.value = true
 
-    setTimeout(() => {
-      submitIsLoading.value = false
-    }, 2000)
+    $fetch('/api/v1/auth/login', {
+      method: 'POST',
+      body: state
+    })
+      .then((res) => {
+        console.log(res)
+
+        navigateTo('/')
+      })
+      .catch((err) => {
+        toast.add({
+          title: 'Erro ao acessar conta',
+          description: err.data.message,
+          color: 'error',
+          icon: 'i-heroicons-exclamation-triangle'
+        })
+
+        submitIsLoading.value = false
+      })
   }
 
   const changePasswordVisibility = () => {
