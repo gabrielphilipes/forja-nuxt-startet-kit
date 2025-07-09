@@ -47,7 +47,7 @@
           icon: 'i-heroicons-check-circle'
         })
 
-        setTimeout(() => navigateTo('/entrar'), 2000)
+        setTimeout(() => navigateTo(`/entrar?email=${state.email}`), 2000)
       })
       .catch((err) => {
         toast.add({
