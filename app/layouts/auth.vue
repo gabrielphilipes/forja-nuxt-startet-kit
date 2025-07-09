@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>
+  <div class="block mb-32">
     <div class="hidden md:block">
       <LayoutHeader />
     </div>
@@ -15,7 +15,7 @@
     </main>
 
     <ul
-      class="flex items-center justify-center gap-4 mt-10 text-xs text-neutral-400 dark:text-neutral-500 mb-32 md:mb-0"
+      class="flex items-center justify-center gap-4 mt-10 text-xs text-neutral-400 dark:text-neutral-500"
     >
       <li>
         <NuxtLink to="/termos-de-uso">Termos de Uso</NuxtLink>

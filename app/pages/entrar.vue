@@ -61,7 +61,7 @@
         <UInput
           v-model="state.email"
           type="email"
-          :placeholder="`philipe_gabriel@${useAppConfig().site_name.toLowerCase()}.com`"
+          :placeholder="`philipes@${useAppConfig().site_name.toLowerCase()}.com`"
           class="block"
           :disabled="submitIsLoading"
           autofocus

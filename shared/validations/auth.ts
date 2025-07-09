@@ -4,3 +4,12 @@ export const LoginUserSchema = z.object({
   email: z.string().email('Confirme se o e-mail está correto').max(255, 'E-mail inválido'),
   password: z.string().max(255, 'Senha inválida')
 })
+
+export const RegisterUserSchema = z.object({
+  name: z.string().min(1, 'Nome é obrigatório').max(255, 'Nome muito longo'),
+  email: z.string().email('Confirme se o e-mail está correto').max(255, 'E-mail inválido'),
+  password: z
+    .string()
+    .min(8, 'Senha deve ter pelo menos 8 caracteres')
+    .max(255, 'Senha muito longa')
+})
