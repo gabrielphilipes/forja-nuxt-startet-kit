@@ -1,16 +1,17 @@
 <script setup lang="ts">
-  import { RegisterUserSchema } from '#shared/validations/auth'
+  import { ResetPasswordSchema } from '#shared/validations/auth'
 
   definePageMeta({ layout: 'auth' })
 
   // Form
   const state = reactive({
-    name: '',
-    email: '',
-    password: ''
+    token: '',
+    password: '',
+    password_confirmation: ''
   })
 
   const passwordVisible = ref(false)
+  const passwordConfirmationVisible = ref(false)
   const submitIsLoading = ref(false)
   const passwordFocused = ref(false)
   const toast = useToast()
@@ -33,25 +34,26 @@
 
   const handleSubmit = () => {
     passwordVisible.value = false
+    passwordConfirmationVisible.value = false
     submitIsLoading.value = true
 
-    $fetch('/api/v1/auth/register', {
+    $fetch('/api/v1/auth/reset-password', {
       method: 'POST',
       body: state
     })
       .then(() => {
         toast.add({
-          title: 'Conta criada com sucesso!',
-          description: 'Faça login para continuar',
+          title: 'Senha alterada com sucesso!',
+          description: 'Faça login com sua nova senha',
           color: 'success',
           icon: 'i-heroicons-check-circle'
         })
 
-        setTimeout(() => navigateTo(`/entrar?email=${state.email}`), 2000)
+        setTimeout(() => navigateTo('/entrar'), 3000)
       })
       .catch((err) => {
         toast.add({
-          title: 'Erro ao criar conta',
+          title: 'Erro ao alterar senha',
           description: err.data.message,
           color: 'error',
           icon: 'i-heroicons-exclamation-triangle'
@@ -60,49 +62,42 @@
         submitIsLoading.value = false
       })
   }
+
+  // Get token from query
+  const route = useRoute()
+  onMounted(() => {
+    const token = route.query.token
+    if (token) {
+      state.token = token as string
+    } else {
+      // Redirect to forgot password if no token
+      navigateTo('/esqueci-minha-senha')
+    }
+  })
 </script>
 
 <template>
   <div>
     <header class="flex flex-col items-center justify-center mb-8">
-      <h1 class="text-3xl">Crie sua conta</h1>
+      <h1 class="text-3xl">Alterar senha</h1>
+      <p class="text-neutral-500 mt-2 text-center">Digite sua nova senha para continuar</p>
     </header>
 
     <UForm
       :state="state"
-      :schema="RegisterUserSchema"
+      :schema="ResetPasswordSchema"
       class="flex flex-col gap-4"
       @submit="handleSubmit"
     >
-      <UFormField name="name" label="Nome completo">
-        <UInput
-          v-model="state.name"
-          type="text"
-          placeholder="Seu nome completo"
-          class="block"
-          :disabled="submitIsLoading"
-          autofocus
-        />
-      </UFormField>
-
-      <UFormField name="email" label="E-mail">
-        <UInput
-          v-model="state.email"
-          type="email"
-          :placeholder="`philipes@${useAppConfig().site_name.toLowerCase()}.com`"
-          class="block"
-          :disabled="submitIsLoading"
-        />
-      </UFormField>
-
       <UPopover :open="showPasswordPopover">
-        <UFormField name="password" label="Senha">
+        <UFormField name="password" label="Nova senha">
           <UInput
             v-model="state.password"
             :type="passwordVisible ? 'text' : 'password'"
             placeholder="********"
             class="block"
             :disabled="submitIsLoading"
+            autofocus
             @focus="passwordFocused = true"
             @blur="passwordFocused = false"
           >
@@ -186,17 +181,40 @@
         </template>
       </UPopover>
 
-      <UButton type="submit" size="sm" block :loading="submitIsLoading"> Criar conta </UButton>
+      <UFormField name="password_confirmation" label="Confirmar nova senha">
+        <UInput
+          v-model="state.password_confirmation"
+          :type="passwordConfirmationVisible ? 'text' : 'password'"
+          placeholder="********"
+          class="block"
+          :disabled="submitIsLoading"
+        >
+          <template #trailing>
+            <UPopover mode="hover">
+              <Icon
+                :name="passwordConfirmationVisible ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+                class="cursor-pointer"
+                :class="{ 'opacity-50 !cursor-not-allowed': submitIsLoading }"
+                @click="passwordConfirmationVisible = !passwordConfirmationVisible"
+              />
+
+              <template #content>
+                <p class="flex items-center gap-2 text-xs p-2">
+                  <span>{{ passwordConfirmationVisible ? 'Ocultar senha' : 'Mostrar senha' }}</span>
+                </p>
+              </template>
+            </UPopover>
+          </template>
+        </UInput>
+      </UFormField>
+
+      <UButton type="submit" size="sm" block :loading="submitIsLoading"> Alterar senha </UButton>
     </UForm>
 
-    <USeparator class="my-8" label="ou" />
-
-    <div class="flex flex-col items-center justify-center gap-4">
+    <div class="flex flex-col items-center justify-center gap-4 mt-8">
       <span class="text-sm text-neutral-500">
-        Já tem uma conta? <NuxtLink to="/entrar">Faça login</NuxtLink>
+        Lembrou sua senha? <NuxtLink to="/entrar">Faça login</NuxtLink>
       </span>
-
-      <AuthOauth :disabled-buttons="submitIsLoading" />
     </div>
   </div>
 </template>
