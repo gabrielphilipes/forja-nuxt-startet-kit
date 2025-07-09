@@ -224,7 +224,9 @@ describe('POST /api/v1/auth/reset-password', () => {
       })
 
       expect(status).toBe(400)
-      expect(data.message).toBe('A senha deve ter pelo menos 8 caracteres')
+      expect(data.message).toBe('Ajuste os dados enviados e tente novamente')
+      expect(data.data.password).toBeDefined()
+      expect(data.data.password).toContain('Senha deve ter pelo menos 8 caracteres')
     })
 
     test('should reject password without uppercase letter', async () => {
@@ -377,7 +379,9 @@ describe('POST /api/v1/auth/reset-password', () => {
       })
 
       expect(status).toBe(400)
-      expect(data.message).toBe('As senhas não coincidem')
+      expect(data.message).toBe('Ajuste os dados enviados e tente novamente')
+      expect(data.data.password_confirmation).toBeDefined()
+      expect(data.data.password_confirmation).toContain('As senhas não coincidem')
     })
   })
 

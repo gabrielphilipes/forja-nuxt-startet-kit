@@ -1,12 +1,10 @@
-import { ForgotPasswordSchema } from '#server/utils/validations/auth'
+import { ForgotPasswordSchema } from '#shared/validations/auth'
 import user from '#server/models/user'
 
 export default defineEventHandler(async (event) => {
   const { success, data, error } = await readValidatedBody(event, (body) =>
     ForgotPasswordSchema.safeParse(body)
   )
-
-  const expirationTime = getQuery(event)?.expiration_time as number | undefined
 
   if (!success) {
     throw createErrorValidation('Ajuste os dados enviados e tente novamente', error)
@@ -25,5 +23,6 @@ export default defineEventHandler(async (event) => {
     return
   }
 
+  const expirationTime = getQuery(event)?.expiration_time as number | undefined
   await user.forgotPassword(userToResetPassword, expirationTime)
 })

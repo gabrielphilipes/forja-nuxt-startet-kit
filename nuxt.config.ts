@@ -1,3 +1,6 @@
+import routesCustom from './app/routes.config.ts'
+import tailwindcss from '@tailwindcss/vite'
+import type { NuxtPage } from 'nuxt/schema'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'node:path'
 
@@ -10,16 +13,25 @@ export default defineNuxtConfig({
   serverDir: 'server',
   nitro: {
     preset: 'vercel',
-
-    rollupConfig: {
-      plugins: [vue()]
-    }
+    rollupConfig: { plugins: [vue()] }
   },
 
-  modules: ['@nuxt/eslint', '@nuxt/test-utils/module', 'nuxt-auth-utils'],
+  modules: ['@nuxt/eslint', '@nuxt/test-utils/module', 'nuxt-auth-utils', '@nuxt/ui'],
+
+  css: ['~/assets/css/general.css'],
+
+  vite: { plugins: [tailwindcss()] },
 
   alias: {
+    '#server': resolve(__dirname, 'server'),
+    '#app': resolve(__dirname, 'app'),
     '#tests': resolve(__dirname, 'tests'),
-    '#server': resolve(__dirname, 'server')
+    '#shared': resolve(__dirname, 'shared')
+  },
+
+  hooks: {
+    'pages:extend': (pages: NuxtPage[]) => {
+      pages.push(...routesCustom)
+    }
   }
 })

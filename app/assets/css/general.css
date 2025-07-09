@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@layer base {
+  a,
+  input,
+  textarea,
+  button {
+    @apply !transition-all !duration-150 !ease-in-out;
+  }
+
+  a {
+    @apply underline hover:text-primary;
+  }
+}
