@@ -3,7 +3,7 @@
 
   const user = useState<UserLogin | null>('user')
 
-  definePageMeta({ middleware: 'front' })
+  definePageMeta({ middleware: 'app' })
 
   const logout = async () => {
     const { clear: logoutUserSession, fetch: refreshUserSession } = useUserSession()
