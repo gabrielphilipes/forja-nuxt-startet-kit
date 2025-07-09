@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ForgotPasswordSchema } from '#shared/validations/auth'
 
-  definePageMeta({ layout: 'auth' })
+  definePageMeta({ layout: 'auth', middleware: 'auth' })
 
   // Form
   const state = reactive({

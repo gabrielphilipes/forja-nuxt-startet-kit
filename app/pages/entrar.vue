@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { LoginUserSchema } from '#shared/validations/auth'
 
-  definePageMeta({ layout: 'auth' })
+  definePageMeta({ layout: 'auth', middleware: 'auth' })
 
   // Form
   const state = reactive({
@@ -23,10 +23,8 @@
       method: 'POST',
       body: state
     })
-      .then((res) => {
-        console.log(res)
-
-        navigateTo('/')
+      .then(() => {
+        window.location.href = '/'
       })
       .catch((err) => {
         toast.add({
