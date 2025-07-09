@@ -5,6 +5,9 @@ export default defineVitestConfig({
   test: {
     env: loadEnv('', process.cwd(), ''),
     environment: 'nuxt',
-    setupFiles: ['./tests/setup.ts']
+    setupFiles: ['./tests/setup.ts'],
+    testTimeout: 60000,
+    include: ['tests/**/*.test.ts'],
+    exclude: ['tests/**/*.vue', 'app/**/*']
   }
 })

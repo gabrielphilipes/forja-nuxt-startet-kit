@@ -24,7 +24,7 @@
       body: state
     })
       .then(() => {
-        window.location.href = '/'
+        window.location.href = '/dashboard'
       })
       .catch((err) => {
         toast.add({

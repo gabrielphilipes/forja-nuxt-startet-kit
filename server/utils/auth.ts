@@ -32,8 +32,6 @@ const requiredAuth = async (event: H3Event) => {
     const data = await validateAuth(event)
     email = data.email
   } catch (error) {
-    await clearUserSession(event)
-
     throw createError({
       statusCode: 401,
       statusMessage: 'Unauthorized',
@@ -44,8 +42,6 @@ const requiredAuth = async (event: H3Event) => {
 
   const user = await userModel.findByEmail(email)
   if (!user) {
-    await clearUserSession(event)
-
     throw createError({
       statusCode: 401,
       statusMessage: 'Unauthorized',
