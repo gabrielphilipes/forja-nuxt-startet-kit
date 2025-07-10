@@ -2,6 +2,7 @@
   import { ForgotPasswordSchema } from '#shared/validations/auth'
 
   definePageMeta({ layout: 'auth', middleware: 'auth' })
+  useSeoMeta({ title: 'Recupere seu acesso' })
 
   // Form
   const state = reactive({

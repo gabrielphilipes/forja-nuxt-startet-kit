@@ -2,6 +2,7 @@
   import { LoginUserSchema } from '#shared/validations/auth'
 
   definePageMeta({ layout: 'auth', middleware: 'auth' })
+  useSeoMeta({ title: 'Acesse sua conta' })
 
   // Form
   const state = reactive({

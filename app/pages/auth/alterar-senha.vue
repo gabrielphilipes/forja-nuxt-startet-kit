@@ -2,6 +2,7 @@
   import { ResetPasswordSchema } from '#shared/validations/auth'
 
   definePageMeta({ layout: 'auth', middleware: 'auth' })
+  useSeoMeta({ title: 'Alterar senha' })
 
   // Form
   const state = reactive({

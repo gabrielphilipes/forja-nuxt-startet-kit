@@ -1,5 +1,6 @@
 <script setup lang="ts">
   definePageMeta({ layout: 'external' })
+  useSeoMeta({ title: 'Termos de Uso' })
 
   const nav = [
     {

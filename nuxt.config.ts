@@ -41,6 +41,14 @@ export default defineNuxtConfig({
     }
   },
 
+  runtimeConfig: {
+    public: {
+      site_name: process.env.SITE_NAME || 'Forja',
+      site_description: process.env.SITE_DESCRIPTION || 'Descrição do site',
+      site_url: process.env.SITE_URL || 'https://forja.philipe.dev'
+    }
+  },
+
   googleFonts: {
     families: {
       UoqMunThenKhung: [400],
