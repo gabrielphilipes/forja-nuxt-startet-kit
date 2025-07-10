@@ -11,6 +11,6 @@
   }
 
   a {
-    @apply underline hover:text-primary;
+    @apply hover:text-primary;
   }
 }
