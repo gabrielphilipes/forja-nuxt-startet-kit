@@ -17,9 +17,9 @@
   <LayoutExternalContent :nav="nav">
     <div class="prose prose-sm prose-neutral dark:prose-invert max-w-none mx-auto">
       <header class="flex flex-col">
-        <h1 class="-mb-4">Termos de Uso</h1>
+        <h1 class="-mb-4">Política de Privacidade</h1>
 
-        <p class="text-sm opacity-50">Última atualização: 10 de julho de 2025</p>
+        <p class="text-sm opacity-50">Última atualização: 15 de julho de 2025</p>
       </header>
 
       <p>

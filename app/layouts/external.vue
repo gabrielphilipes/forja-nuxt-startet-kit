@@ -22,9 +22,7 @@
       </template>
     </LayoutHeader>
 
-    <div class="w-10/12 max-w-xl mx-auto mt-12 md:mt-28">
-      <NuxtPage />
-    </div>
+    <NuxtPage />
 
     <footer class="flex items-center justify-center w-10/12 mx-auto mt-10 text-xs text-neutral-500">
       <p>&copy; {{ new Date().getFullYear() }} {{ siteName }}. Todos os direitos reservados.</p>

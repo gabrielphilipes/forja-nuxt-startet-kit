@@ -9,5 +9,5 @@ export default <NuxtPage[]>[
 
   // Compliance routes
   { path: '/termos-de-uso', file: '~/pages/compliance/termos-de-uso.vue' },
-  { path: '/politicas-de-privacidade', file: '~/pages/compliance/politicas-de-privacidade.vue' }
+  { path: '/politica-de-privacidade', file: '~/pages/compliance/politica-de-privacidade.vue' }
 ]
