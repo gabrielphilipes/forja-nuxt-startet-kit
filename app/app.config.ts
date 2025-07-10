@@ -6,7 +6,7 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: 'cursor-pointer rounded-xl'
+        base: 'cursor-pointer rounded-xl no-underline'
       }
     },
     input: {

@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  definePageMeta({ layout: 'external' })
+</script>
 
 <template>
   <div>
