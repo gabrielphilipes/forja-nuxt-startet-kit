@@ -2,6 +2,7 @@
   import { RegisterUserSchema } from '#shared/validations/auth'
 
   definePageMeta({ layout: 'auth', middleware: 'auth' })
+  useSeoMeta({ title: 'Cadastre-se para ter acesso a todos os recursos' })
 
   // Form
   const state = reactive({

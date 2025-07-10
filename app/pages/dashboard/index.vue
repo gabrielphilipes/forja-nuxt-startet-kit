@@ -1,9 +1,10 @@
 <script setup lang="ts">
   import type { UserLogin } from '#server/models/user'
 
-  const user = useState<UserLogin | null>('user')
-
   definePageMeta({ middleware: 'app' })
+  useSeoMeta({ title: 'Painel de controle' })
+
+  const user = useState<UserLogin | null>('user')
 
   const logout = async () => {
     const { clear: logoutUserSession, fetch: refreshUserSession } = useUserSession()
