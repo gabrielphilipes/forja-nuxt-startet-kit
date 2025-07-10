@@ -2,6 +2,10 @@
 @plugin '@tailwindcss/typography';
 @import '@nuxt/ui';
 
+@theme {
+  --font-sans: 'FunnelSans', sans-serif;
+}
+
 @layer base {
   a,
   input,
@@ -12,5 +16,14 @@
 
   a {
     @apply hover:text-primary;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'UoqMunThenKhung', sans-serif;
   }
 }

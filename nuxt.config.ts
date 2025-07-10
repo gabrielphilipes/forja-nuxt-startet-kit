@@ -16,7 +16,13 @@ export default defineNuxtConfig({
     rollupConfig: { plugins: [vue()] }
   },
 
-  modules: ['@nuxt/eslint', '@nuxt/test-utils/module', 'nuxt-auth-utils', '@nuxt/ui'],
+  modules: [
+    '@nuxt/eslint',
+    '@nuxt/test-utils/module',
+    '@nuxt/ui',
+    '@nuxtjs/google-fonts',
+    'nuxt-auth-utils'
+  ],
 
   css: ['~/assets/css/general.css'],
 
@@ -33,5 +39,15 @@ export default defineNuxtConfig({
     'pages:extend': (pages: NuxtPage[]) => {
       pages.push(...routesCustom)
     }
+  },
+
+  googleFonts: {
+    families: {
+      UoqMunThenKhung: [400],
+      FunnelSans: [300, 400, 500, 600, 700]
+    },
+    display: 'swap',
+    download: true,
+    preload: true
   }
 })
