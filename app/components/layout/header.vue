@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <header class="flex items-center justify-between w-full h-16 px-4">
+  <header class="flex items-center justify-between w-full max-w-screen-lg mx-auto h-16 px-4">
     <NuxtLink to="/" class="flex items-center justify-between w-full h-full">
       <img src="assets/images/logo.svg" :alt="siteName" class="size-20 md:size-16 dark:invert" />
     </NuxtLink>

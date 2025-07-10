@@ -24,7 +24,7 @@
       <span class="text-xs text-neutral-400 dark:text-neutral-500">|</span>
 
       <li>
-        <NuxtLink to="/política-de-privacidade">Política de Privacidade </NuxtLink>
+        <NuxtLink to="/politica-de-privacidade">Política de Privacidade </NuxtLink>
       </li>
     </ul>
   </div>
