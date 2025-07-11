@@ -6,12 +6,7 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: 'cursor-pointer rounded-xl'
-      }
-    },
-    input: {
-      slots: {
-        base: 'rounded-xl'
+        base: 'cursor-pointer'
       }
     },
     toast: {
@@ -47,6 +42,12 @@ export default defineAppConfig({
             description: 'text-red-400'
           }
         }
+      }
+    },
+    select: {
+      slots: {
+        base: 'cursor-pointer',
+        item: 'cursor-pointer'
       }
     }
   }

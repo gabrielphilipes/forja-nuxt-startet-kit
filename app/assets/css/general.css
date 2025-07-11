@@ -6,6 +6,10 @@
   --font-sans: 'FunnelSans', sans-serif;
 }
 
+:root {
+  --ui-radius: 0.5rem;
+}
+
 @layer base {
   a,
   input,
