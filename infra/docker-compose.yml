@@ -6,6 +6,8 @@ services:
       - ../.env
     ports:
       - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - forja-postgres-data:/var/lib/postgresql/data
 
   mailcrab:
     image: marlonb/mailcrab:latest
@@ -13,3 +15,6 @@ services:
     ports:
       - '${MAILCRAB_PORT:-1080}:1080'
       - '${MAILCRAB_SMTP_PORT:-1025}:1025'
+
+volumes:
+  forja-postgres-data:
