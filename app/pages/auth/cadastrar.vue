@@ -82,7 +82,6 @@
           placeholder="Seu nome completo"
           class="block"
           :disabled="submitIsLoading"
-          autofocus
         />
       </UFormField>
 

@@ -98,7 +98,6 @@
             placeholder="********"
             class="block"
             :disabled="submitIsLoading"
-            autofocus
             @focus="passwordFocused = true"
             @blur="passwordFocused = false"
           >

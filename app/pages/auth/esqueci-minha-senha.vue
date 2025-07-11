@@ -77,7 +77,6 @@
           :placeholder="`philipes@${useAppConfig().site_name.toLowerCase()}.com`"
           class="block"
           :disabled="submitIsLoading"
-          autofocus
         />
       </UFormField>
 

@@ -10,8 +10,6 @@
     password: ''
   })
 
-  const emailFocused = ref(true)
-  const passwordFocused = ref(false)
   const passwordVisible = ref(false)
   const submitIsLoading = ref(false)
   const toast = useToast()
@@ -52,8 +50,6 @@
     const email = route.query.email
     if (email) {
       state.email = email as string
-      emailFocused.value = false
-      passwordFocused.value = true
     }
 
     // Remove query from url
@@ -80,7 +76,6 @@
           :placeholder="`philipes@${useAppConfig().site_name.toLowerCase()}.com`"
           class="block"
           :disabled="submitIsLoading"
-          :autofocus="emailFocused"
         />
       </UFormField>
 
@@ -91,7 +86,6 @@
           placeholder="********"
           class="block"
           :disabled="submitIsLoading"
-          :autofocus="passwordFocused"
         >
           <template #trailing>
             <UPopover mode="hover">
