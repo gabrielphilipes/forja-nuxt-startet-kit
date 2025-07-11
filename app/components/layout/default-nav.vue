@@ -3,6 +3,17 @@
 
   const siteName = useRuntimeConfig().public.site_name
 
+  // Start: close button
+  defineProps<{
+    showCloseButton?: boolean
+  }>()
+
+  const emit = defineEmits<{
+    (e: 'close'): void
+  }>()
+
+  // End: close button
+
   // Start: teams
   const selectedTeam = ref<string>('time_2')
 
@@ -26,9 +37,20 @@
 
 <template>
   <header class="flex flex-col gap-2 p-3">
-    <ULink to="/" class="w-12">
-      <img src="/assets/images/logo.svg" :alt="siteName" :title="siteName" class="dark:invert" />
-    </ULink>
+    <div class="flex items-center justify-between">
+      <ULink to="/" class="w-18 md:w-12">
+        <img src="/assets/images/logo.svg" :alt="siteName" :title="siteName" class="dark:invert" />
+      </ULink>
+
+      <UButton
+        v-if="showCloseButton"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        icon="gridicons:cross"
+        @click="emit('close')"
+      />
+    </div>
 
     <USelect
       v-model="selectedTeam"
