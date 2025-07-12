@@ -57,7 +57,7 @@
 
 <template>
   <div>
-    <header class="flex flex-col items-center justify-center mb-8">
+    <header class="flex flex-col items-start justify-start mb-8">
       <h1 class="text-3xl">Esqueceu sua senha?</h1>
       <p class="text-neutral-500 mt-2 text-center">
         Digite seu e-mail e enviaremos um link para redefinir sua senha

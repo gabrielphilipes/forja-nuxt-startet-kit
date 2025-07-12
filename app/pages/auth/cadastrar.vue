@@ -65,7 +65,7 @@
 
 <template>
   <div>
-    <header class="flex flex-col items-center justify-center mb-8">
+    <header class="flex flex-col items-start justify-start mb-8">
       <h1 class="text-3xl">Crie sua conta</h1>
     </header>
 
