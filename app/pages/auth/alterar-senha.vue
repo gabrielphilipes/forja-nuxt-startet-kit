@@ -79,9 +79,9 @@
 
 <template>
   <div>
-    <header class="flex flex-col items-center justify-center mb-8">
+    <header class="flex flex-col items-start justify-start mb-8">
       <h1 class="text-3xl">Alterar senha</h1>
-      <p class="text-neutral-500 mt-2 text-center">Digite sua nova senha para continuar</p>
+      <p class="text-neutral-500 mt-2">Digite sua nova senha para continuar</p>
     </header>
 
     <UForm
@@ -98,7 +98,6 @@
             placeholder="********"
             class="block"
             :disabled="submitIsLoading"
-            autofocus
             @focus="passwordFocused = true"
             @blur="passwordFocused = false"
           >

@@ -15,7 +15,7 @@
     </main>
 
     <ul
-      class="flex items-center justify-center gap-4 mt-10 text-xs text-neutral-400 dark:text-neutral-500"
+      class="flex items-center justify-center gap-4 mt-32 text-xs text-neutral-400 dark:text-neutral-500"
     >
       <li>
         <NuxtLink to="/termos-de-uso">Termos de Uso</NuxtLink>

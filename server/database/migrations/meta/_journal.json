@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1751030505508,
-      "tag": "0000_luxuriant_alex_power",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1751032292022,
-      "tag": "0001_jittery_zodiak",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1751394504404,
-      "tag": "0002_rich_nocturne",
+      "when": 1752280582598,
+      "tag": "0000_magical_secret_warriors",
       "breakpoints": true
     }
   ]
