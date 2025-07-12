@@ -1,15 +1,15 @@
 <script setup lang="ts">
   import type { NuxtError } from '#app'
 
-  const { loggedIn } = useUserSession()
-  const siteName = process.env.SITE_NAME || 'Forja'
-
-  defineProps({
+  const props = defineProps({
     error: {
       type: Object as () => NuxtError,
       required: true
     }
   })
+
+  const { loggedIn } = useUserSession()
+  const siteName = process.env.SITE_NAME || 'Forja'
 
   const { path } = useRoute()
 
@@ -35,6 +35,13 @@
       description: 'A requisição que você fez é inválida. Por favor, tente novamente.'
     }
   }
+
+  const errorMessage = friendlyMessage[props.error.statusCode as keyof typeof friendlyMessage]
+
+  useSeoMeta({
+    title: errorMessage.title,
+    description: errorMessage.description
+  })
 
   const handleError = () => {
     clearError()
@@ -65,10 +72,10 @@
       <div class="flex flex-col items-start gap-2">
         <p class="text-sm font-bold">{{ error?.statusCode }}</p>
         <h1 class="text-4xl font-bold">
-          {{ friendlyMessage[error.statusCode as keyof typeof friendlyMessage].title }}
+          {{ errorMessage.title }}
         </h1>
         <p class="text-sm text-neutral-500">
-          {{ friendlyMessage[error.statusCode as keyof typeof friendlyMessage].description }}
+          {{ errorMessage.description }}
         </p>
 
         <UButton
