@@ -52,7 +52,7 @@ export default defineNuxtConfig({
   googleFonts: {
     families: {
       UoqMunThenKhung: [400],
-      FunnelSans: [300, 400, 500, 600, 700]
+      Geist: [100, 200, 300, 400, 500, 600, 700, 800, 900]
     },
     display: 'swap',
     download: true,

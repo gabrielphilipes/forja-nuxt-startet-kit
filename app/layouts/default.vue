@@ -13,7 +13,7 @@
     <!-- Start: desktop nav -->
     <div class="hidden md:block fixed top-0 left-2 h-full w-full max-w-[250px] py-2">
       <section
-        class="flex flex-col w-full h-full rounded-md bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-950 shadow-xl shadow-neutral-200 dark:shadow-neutral-950"
+        class="flex flex-col w-full h-full rounded-md bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-950 shadow-xl shadow-neutral-100 dark:shadow-neutral-950"
       >
         <LayoutDefaultNav />
       </section>
@@ -22,7 +22,7 @@
 
     <!-- Start: mobile nav -->
     <div
-      class="md:hidden fixed top-0 left-0 w-full py-2 bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-950"
+      class="md:hidden fixed top-0 left-0 w-full py-2 bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-950 z-50"
     >
       <div class="flex items-center justify-between w-11/12 mx-auto">
         <ULink to="/" class="w-18">
@@ -56,7 +56,7 @@
         <USeparator />
 
         <div
-          class="flex flex-col md:flex-row items-center justify-between max-w-7xl mt-5 text-xs text-neutral-500"
+          class="flex flex-col md:flex-row items-center justify-between max-w-7xl mt-5 text-xs text-neutral-500 md:mr-3"
         >
           <p>&copy; {{ new Date().getFullYear() }} {{ siteName }}. Todos os direitos reservados.</p>
 
