@@ -22,7 +22,7 @@
 
     <!-- Start: mobile nav -->
     <div
-      class="md:hidden fixed top-0 left-0 w-full py-2 bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-950"
+      class="md:hidden fixed top-0 left-0 w-full py-2 bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-950 z-50"
     >
       <div class="flex items-center justify-between w-11/12 mx-auto">
         <ULink to="/" class="w-18">
