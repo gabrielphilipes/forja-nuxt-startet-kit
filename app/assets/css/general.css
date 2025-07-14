@@ -3,7 +3,7 @@
 @import '@nuxt/ui';
 
 @theme {
-  --font-sans: 'FunnelSans', sans-serif;
+  --font-sans: 'Geist', sans-serif;
 }
 
 :root {
