@@ -1,23 +1,26 @@
 <script setup lang="ts">
-  import type { UserLogin } from '#server/models/user'
-
   definePageMeta({ middleware: 'app', layout: 'default' })
   useSeoMeta({ title: 'Painel de controle' })
-
-  const user = useState<UserLogin | null>('user')
-
-  const logout = async () => {
-    const { clear: logoutUserSession, fetch: refreshUserSession } = useUserSession()
-    await logoutUserSession()
-    await refreshUserSession()
-    await navigateTo('/entrar')
-  }
 </script>
 
 <template>
-  <div>
-    <h1>Olá, {{ user?.name }} 👋🏻</h1>
+  <LayoutDefaultContent
+    title="Dashboard"
+    description="Painel de controle do sistema"
+    icon="i-heroicons-home"
+  >
+    <template #actions>
+      <UButton>
+        <UIcon name="i-heroicons-plus" class="size-5" />
+        <span>Novo</span>
+      </UButton>
+    </template>
 
-    <UButton @click="logout">Sair</UButton>
-  </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
+      <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
+      <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
+      <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
+    </div>
+  </LayoutDefaultContent>
 </template>
