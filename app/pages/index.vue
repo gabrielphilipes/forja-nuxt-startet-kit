@@ -1,5 +1,23 @@
 <template>
-  <div>
-    <h1>Hello World</h1>
-  </div>
+  <LayoutDefaultContent
+    title="Dashboard"
+    description="Painel de controle do sistema"
+    icon="i-heroicons-home"
+  >
+    <template #actions>
+      <UButton>
+        <UIcon name="i-heroicons-plus" class="size-5" />
+        <span>Novo</span>
+      </UButton>
+    </template>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-8 mb-5">
+      <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
+      <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
+      <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
+      <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
+    </div>
+
+    <DashboardTable />
+  </LayoutDefaultContent>
 </template>

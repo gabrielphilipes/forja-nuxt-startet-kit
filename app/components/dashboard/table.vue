@@ -172,7 +172,7 @@
       accessorKey: 'date',
       header: 'Data',
       cell: ({ row }) => {
-        return new Date(row.getValue('date')).toLocaleString('en-US', {
+        return new Date(row.getValue('date')).toLocaleString('pt-BR', {
           day: 'numeric',
           month: 'short',
           hour: '2-digit',
