@@ -16,11 +16,13 @@
       </UButton>
     </template>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-5">
       <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
       <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
       <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
       <DashboardSummaryCard title="Usuários" value="100" :percentage="10" />
     </div>
+
+    <DashboardTable />
   </LayoutDefaultContent>
 </template>
