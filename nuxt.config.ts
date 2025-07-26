@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   srcDir: 'app',
   serverDir: 'server',
   nitro: {
-    preset: 'vercel',
+    // preset: 'vercel',
     rollupConfig: { plugins: [vue()] }
   },
 
